@@ -160,7 +160,7 @@ export default function AddGamesPage() {
     } catch (err: any) {
       const isNetworkOffline = err.message === "Failed to fetch" || err instanceof TypeError;
       const displayMessage = isNetworkOffline
-        ? "Unable to connect to the backend server. Please verify the Express backend is running on port 5000."
+        ? `Unable to connect to the backend server. Please verify your API URL endpoint is correct (${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}).`
         : (err.message || "An unexpected error occurred.");
 
       console.warn("Listing warning:", err);

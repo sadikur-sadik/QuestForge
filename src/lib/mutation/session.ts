@@ -11,7 +11,9 @@ export async function getSessionToken(): Promise<string | null> {
       try {
         const { cookies } = await import("next/headers");
         const cookieStore = await cookies();
-        return cookieStore.get("better-auth.session_token")?.value || null;
+        return cookieStore.get("better-auth.session_token")?.value ||
+               cookieStore.get("__secure-better-auth.session_token")?.value ||
+               null;
       } catch (e) {
         // cookies context might not be available
       }
