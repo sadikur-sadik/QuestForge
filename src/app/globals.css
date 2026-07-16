@@ -1,0 +1,93 @@
+@import "tailwindcss";
+@import "@heroui/styles";
+
+@source "../../node_modules/@heroui/theme/dist/**/*.{js,ts,jsx,tsx}";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ─────────────────────────────────────────────
+   QuestForge Design System — CSS Variables
+   Three accent colors + neutral theme tokens
+───────────────────────────────────────────── */
+
+:root {
+  /* ── Accent Colors (shared, theme-invariant) ── */
+  --color-accent-primary: #6d28d9;   /* Midnight Purple  */
+  --color-accent-secondary: #06b6d4; /* Cyan Glow        */
+  --color-accent-danger: #e11d48;    /* Rose Crimson     */
+
+  /* ── Light Theme Neutrals ── */
+  --color-bg: #f8fafc;
+  --color-surface: #ffffff;
+  --color-text: #0f172a;
+  --color-border: #e2e8f0;
+  --color-muted: #64748b;
+}
+
+.dark {
+  /* ── Dark Theme Neutrals ── */
+  --color-bg: #0f172a;
+  --color-surface: #1e293b;
+  --color-text: #f8fafc;
+  --color-border: #334155;
+  --color-muted: #94a3b8;
+}
+
+@theme inline {
+  --color-bg: var(--color-bg);
+  --color-surface: var(--color-surface);
+  --color-text: var(--color-text);
+  --color-border: var(--color-border);
+  --color-muted: var(--color-muted);
+  --color-accent-primary: var(--color-accent-primary);
+  --color-accent-secondary: var(--color-accent-secondary);
+  --color-accent-danger: var(--color-accent-danger);
+}
+
+/* ── Base ── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  font-family: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
+  min-height: 100vh;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-bg);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-muted);
+}
+
+/* ── Focus ring ── */
+:focus-visible {
+  outline: 2px solid var(--color-accent-primary);
+  outline-offset: 2px;
+}
+
+/* ── Selection ── */
+::selection {
+  background: #6d28d930;
+  color: var(--color-text);
+}
