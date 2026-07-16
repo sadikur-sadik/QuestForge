@@ -1,36 +1,36 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# QuestForge 🚀
 
-## Getting Started
+QuestForge is a state-of-the-art digital gaming marketplace and interactive catalog registry built for completionists, reviewers, and collectors.
 
-First, run the development server:
+![QuestForge Landing Page Banner](public/banner.svg)
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+---
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## ⚡ Live Link
+- **URL**: _(Coming Soon)_
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 📖 Project Purpose & Description
+QuestForge serves as a unified ecosystem for players and creators alike. It allows players to search for hot gaming releases, catalog their interactive quests, post reviews, manage wishlists, and store game credentials in a personal inventory vault. For creators, it acts as a publishing registry to list new titles, manage keys, and track community interactions.
 
-## Learn More
+---
 
-To learn more about Next.js, take a look at the following resources:
+## 🌟 Key Features
+- **Adventure Realms Categorisation**: Dynamic genre discovery panels allowing users to browse realms based on specific tags and themes.
+- **Featured Releases**: Curated carousel and limited marketplace cards showcasing trending games from the database.
+- **Digital Vault Inventory (Gaming Bucket)**: Secure storage drawer for user licensing keys, vault listings, and interactive wishlists.
+- **Google OAuth & Native Auth**: Social provider sign-in integration powered by Better Auth.
+- **Merchant Listings & Key Distribution**: Seamless game publishing form with real-time base64 image uploads and key distribution utilities.
+- **Modern Responsive Design**: Centered mobile layouts, consistent branding gradients, animations, and glowing glassmorphism theme states.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+---
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 🛠️ Technology Stack
+- **Frontend Core**: React 19, Next.js 15 (App Router), TypeScript
+- **Styling**: TailwindCSS, CSS Variables, Ambient Glow layers
+- **Authentication**: Better Auth (Email & Password, Google OAuth Social Provider)
+- **Database Layer**: MongoDB, Mongoose adapter
+- **UI Components & Icons**: HeroUI, Gravity UI Icons
+- **Image Hosting**: ImgBB API Integration
+- **Server Environment**: Node.js, Express, TypeScript (separate backend service)
