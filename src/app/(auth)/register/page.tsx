@@ -32,6 +32,7 @@ export default function RegisterPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [selectedRole, setSelectedRole] = useState<"buyer" | "seller">("buyer");
 
   // Avatar Upload States
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
@@ -155,14 +156,14 @@ export default function RegisterPage() {
 
 
 
-      // Un-commented the signup logic so users can register successfully
       const { data, error } = await authClient.signUp.email({
         name: name,
         email: email,
         password: password,
         image: imageUrl || undefined,
+        role: selectedRole,
         callbackURL: "/"
-      });
+      } as any);
       if (error) {
         console.error("Registration error:", error);
         toast.error(error.message || "Registration failed. Please try again.");
@@ -170,7 +171,17 @@ export default function RegisterPage() {
       }
 
       if (data) {
-        toast.success("Registration successful!");
+        try {
+          await fetch("/api/user/role", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ role: selectedRole })
+          });
+        } catch (rErr) {
+          console.error("Failed to sync role:", rErr);
+        }
+
+        toast.success(`Account created successfully as ${selectedRole.toUpperCase()}!`);
         router.push("/");
       }
 
@@ -303,6 +314,44 @@ export default function RegisterPage() {
                 {avatarError && (
                   <span className="text-xs text-rose-500 font-semibold">{avatarError}</span>
                 )}
+              </div>
+
+              {/* Role Selection */}
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[10px] font-bold text-[var(--color-text)] tracking-wider uppercase opacity-80">
+                  Select Account Role
+                </label>
+                <div className="grid grid-cols-2 gap-2.5">
+                  <button
+                    type="button"
+                    onClick={() => setSelectedRole("buyer")}
+                    className={`
+                      flex flex-col items-center justify-center py-2.5 px-2 rounded-xl border text-[11px] font-bold transition-all cursor-pointer
+                      ${selectedRole === "buyer"
+                        ? "border-emerald-500 bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 shadow-[0_0_12px_rgba(16,185,129,0.25)]"
+                        : "border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-muted)] hover:border-slate-400"
+                      }
+                    `}
+                  >
+                    <span className="text-base mb-0.5">🎮</span>
+                    <span>Buyer Account</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setSelectedRole("seller")}
+                    className={`
+                      flex flex-col items-center justify-center py-2.5 px-2 rounded-xl border text-[11px] font-bold transition-all cursor-pointer
+                      ${selectedRole === "seller"
+                        ? "border-amber-500 bg-amber-500/15 text-amber-600 dark:text-amber-400 shadow-[0_0_12px_rgba(245,158,11,0.25)]"
+                        : "border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-muted)] hover:border-slate-400"
+                      }
+                    `}
+                  >
+                    <span className="text-base mb-0.5">🚀</span>
+                    <span>Seller Account</span>
+                  </button>
+                </div>
               </div>
 
 

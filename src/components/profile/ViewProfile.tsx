@@ -12,17 +12,20 @@ interface ViewProfileProps {
     name: string;
     email: string;
     image?: string | null;
+    role?: string;
   } | null;
 }
 
 export default function ViewProfile({ user }: ViewProfileProps) {
   const [name, setName] = useState(user?.name || "");
+  const [role, setRole] = useState<string>(user?.role || "buyer");
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   
   const [isUploading, setIsUploading] = useState(false);
   const [isSavingName, setIsSavingName] = useState(false);
+  const [isSavingRole, setIsSavingRole] = useState(false);
   const [isSavingPassword, setIsSavingPassword] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -76,6 +79,28 @@ export default function ViewProfile({ user }: ViewProfileProps) {
       toast.error(err.message || "An unexpected error occurred.");
     } finally {
       setIsSavingName(false);
+    }
+  };
+
+  const handleUpdateRole = async (selectedRole: string) => {
+    setIsSavingRole(true);
+    try {
+      const res = await fetch("/api/user/role", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ role: selectedRole }),
+      });
+      if (res.ok) {
+        setRole(selectedRole);
+        toast.success(`Role updated to ${selectedRole.toUpperCase()} successfully!`);
+        window.location.reload();
+      } else {
+        toast.error("Failed to update role.");
+      }
+    } catch (err: any) {
+      toast.error("Error updating role.");
+    } finally {
+      setIsSavingRole(false);
     }
   };
 
@@ -246,6 +271,63 @@ export default function ViewProfile({ user }: ViewProfileProps) {
                 {isSavingName ? "Saving..." : "Save Changes"}
               </button>
             </form>
+
+            {/* Account Role Card */}
+            <div className="p-8 rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm flex flex-col gap-4">
+              <div>
+                <h3 className="text-lg font-bold text-slate-800 dark:text-slate-100">Account Role</h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                  Choose your role on QuestForge: Buyer (gaming & shopping), Seller (game publishing & sales), or Admin.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <button
+                  type="button"
+                  onClick={() => handleUpdateRole("buyer")}
+                  disabled={isSavingRole}
+                  className={`p-4 rounded-2xl border flex flex-col items-center gap-2 text-center transition cursor-pointer ${
+                    role === "buyer"
+                      ? "border-emerald-500 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 ring-2 ring-emerald-500/30 font-bold"
+                      : "border-slate-200 dark:border-slate-800 hover:border-slate-400 text-slate-600 dark:text-slate-300"
+                  }`}
+                >
+                  <span className="text-2xl">🎮</span>
+                  <span className="font-bold text-xs">Buyer</span>
+                  <span className="text-[10px] text-slate-500 opacity-80">Browse, buy & play games</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => handleUpdateRole("seller")}
+                  disabled={isSavingRole}
+                  className={`p-4 rounded-2xl border flex flex-col items-center gap-2 text-center transition cursor-pointer ${
+                    role === "seller"
+                      ? "border-amber-500 bg-amber-500/10 text-amber-600 dark:text-amber-400 ring-2 ring-amber-500/30 font-bold"
+                      : "border-slate-200 dark:border-slate-800 hover:border-slate-400 text-slate-600 dark:text-slate-300"
+                  }`}
+                >
+                  <span className="text-2xl">🚀</span>
+                  <span className="font-bold text-xs">Seller</span>
+                  <span className="text-[10px] text-slate-500 opacity-80">Publish & sell your games</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => handleUpdateRole("admin")}
+                  disabled={isSavingRole}
+                  className={`p-4 rounded-2xl border flex flex-col items-center gap-2 text-center transition cursor-pointer ${
+                    role === "admin"
+                      ? "border-violet-500 bg-violet-500/10 text-violet-600 dark:text-violet-400 ring-2 ring-violet-500/30 font-bold"
+                      : "border-slate-200 dark:border-slate-800 hover:border-slate-400 text-slate-600 dark:text-slate-300"
+                  }`}
+                >
+                  <span className="text-2xl">⚡</span>
+                  <span className="font-bold text-xs">Admin</span>
+                  <span className="text-[10px] text-slate-500 opacity-80">Full administrative control</span>
+                </button>
+              </div>
+            </div>
 
             {/* Change Password Form */}
             <form onSubmit={handleChangePassword} className="p-8 rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm flex flex-col gap-5">

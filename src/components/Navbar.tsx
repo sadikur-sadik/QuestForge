@@ -29,7 +29,7 @@ function useAuthSession() {
       name: session.user.name,
       email: session.user.email,
       avatar: session.user.image || "",
-      role: "player",
+      role: (session.user as any).role || "buyer",
     }
     : null;
 
@@ -49,7 +49,9 @@ const PUBLIC_ROUTES = [
   { label: "My Gaming Bucket", href: "/my-bucket" },
 ];
 
-const AUTH_ROUTES: { label: string; href: string }[] = [];
+const AUTH_ROUTES = [
+  { label: "Dashboard", href: "/dashboard" },
+];
 
 /* ─── Theme Toggle ──────────────────────────────────────── */
 function ThemeToggle() {
@@ -182,7 +184,11 @@ function ProfileDrawer({
             My Profile
           </h2>
           <span className="text-[var(--color-muted)] text-xs font-normal">
-            {user?.role === "admin" ? "Administrator" : "Player Account"}
+            {user?.role === "admin"
+              ? "⚡ Platform Administrator"
+              : user?.role === "seller"
+              ? "🚀 Game Seller / Developer"
+              : "🎮 Buyer / Player Account"}
           </span>
         </div>
 
@@ -200,21 +206,33 @@ function ProfileDrawer({
               <p className="text-[var(--color-muted)] text-xs">{user?.email}</p>
               <span
                 className={`
-                  mt-1.5 inline-flex w-fit items-center rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider
+                  mt-1.5 inline-flex w-fit items-center rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider
                   ${user?.role === "admin"
-                    ? "bg-[#6d28d920] text-[var(--color-accent-primary)]"
-                    : "bg-[#06b6d420] text-[var(--color-accent-secondary)]"
+                    ? "bg-violet-500/20 text-violet-600 dark:text-violet-400 border border-violet-500/30"
+                    : user?.role === "seller"
+                    ? "bg-amber-500/20 text-amber-600 dark:text-amber-400 border border-amber-500/30"
+                    : "bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30"
                   }
                 `}
               >
-                {user?.role}
+                {user?.role === "admin" ? "⚡ Admin" : user?.role === "seller" ? "🚀 Seller" : "🎮 Buyer"}
               </span>
             </div>
           </div>
 
+
+
           <Separator className="bg-[var(--color-border)] my-2" />
 
           <div className="flex flex-col gap-2">
+            <Link
+              href="/dashboard"
+              onClick={onClose}
+              className="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-bold text-violet-600 dark:text-violet-400 bg-violet-500/10 hover:bg-violet-500/20 transition-all duration-200"
+            >
+              <Rocket width={16} height={16} />
+              Role Console / Dashboard
+            </Link>
             <Link
               href="/my-games"
               onClick={onClose}
