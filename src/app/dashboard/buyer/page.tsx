@@ -5,11 +5,15 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { authClient } from "@/lib/auth-client";
 import BuyerDashboard from "@/components/dashboard/BuyerDashboard";
+import SellerDashboard from "@/components/dashboard/SellerDashboard";
+import AdminDashboard from "@/components/dashboard/AdminDashboard";
+import DashboardTestingToggler, { DashboardRole } from "@/components/dashboard/DashboardTestingToggler";
 
 export default function BuyerDashboardPage() {
     const router = useRouter();
     const { data: session, isPending } = authClient.useSession();
-    const [fetchedRole, setFetchedRole] = useState<string>("buyer");
+    const [fetchedRole, setFetchedRole] = useState<DashboardRole>("buyer");
+    const [activeView, setActiveView] = useState<DashboardRole>("buyer");
     const [isLoadingRole, setIsLoadingRole] = useState(true);
 
     useEffect(() => {
@@ -22,20 +26,42 @@ export default function BuyerDashboardPage() {
             if (!session?.user) return;
             try {
                 const res = await fetch("/api/user/role");
+                let dbRole: DashboardRole = "buyer";
                 if (res.ok) {
                     const data = await res.json();
-                    setFetchedRole(data.role || (session.user as any).role || "buyer");
+                    dbRole = (data.role || (session.user as any).role || "buyer") as DashboardRole;
                 } else {
-                    setFetchedRole((session.user as any).role || "buyer");
+                    dbRole = ((session.user as any).role || "buyer") as DashboardRole;
+                }
+                setFetchedRole(dbRole);
+
+                const savedTestRole = localStorage.getItem("questforge_test_role") as DashboardRole;
+                if (savedTestRole && ["buyer", "seller", "admin"].includes(savedTestRole)) {
+                    setActiveView(savedTestRole);
+                } else {
+                    setActiveView("buyer");
                 }
             } catch (err) {
-                setFetchedRole((session.user as any).role || "buyer");
+                const fallbackRole = ((session.user as any).role || "buyer") as DashboardRole;
+                setFetchedRole(fallbackRole);
+                setActiveView("buyer");
             } finally {
                 setIsLoadingRole(false);
             }
         }
         loadRole();
     }, [session, isPending, router]);
+
+    const handleViewChange = (role: DashboardRole) => {
+        setActiveView(role);
+        localStorage.setItem("questforge_test_role", role);
+    };
+
+    const handleRoleUpdated = (newRole: DashboardRole) => {
+        setFetchedRole(newRole);
+        setActiveView(newRole);
+        localStorage.setItem("questforge_test_role", newRole);
+    };
 
     if (isPending || isLoadingRole) {
         return (
@@ -50,43 +76,23 @@ export default function BuyerDashboardPage() {
 
     if (!session?.user) return null;
 
-    // Check Role Access Restriction
-    if (fetchedRole !== "buyer") {
-        return (
-            <div className="min-h-[calc(100vh-64px)] flex items-center justify-center bg-slate-50 dark:bg-slate-950 px-4 py-12">
-                <div className="max-w-md w-full bg-white dark:bg-slate-900 border border-rose-500/20 rounded-3xl p-8 shadow-2xl text-center flex flex-col items-center gap-4">
-                    <div className="w-16 h-16 rounded-2xl bg-rose-500/10 text-rose-500 flex items-center justify-center text-3xl">
-                        🛡️
-                    </div>
-                    <div>
-                        <span className="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-rose-500/10 text-rose-600 border border-rose-500/20">
-                            Restricted Role Access
-                        </span>
-                        <h2 className="text-xl font-black text-slate-900 dark:text-white mt-2">
-                            Buyer Dashboard Restricted
-                        </h2>
-                        <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">
-                            Your active account role is <span className="font-bold text-slate-900 dark:text-white uppercase">{fetchedRole}</span>. This page is dedicated exclusively to Buyer accounts.
-                        </p>
-                    </div>
-
-                    <div className="flex flex-col gap-2 w-full pt-2">
-                        <Link href="/dashboard" className="w-full">
-                            <button className="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs transition shadow-md cursor-pointer">
-                                Return to My Dashboard →
-                            </button>
-                        </Link>
-                    </div>
-                </div>
-            </div>
-        );
-    }
-
     return (
         <div className="relative min-h-[calc(100vh-64px)] w-full py-10 px-4 sm:px-6 lg:px-8 bg-slate-50 dark:bg-slate-950">
             <div className="max-w-7xl mx-auto flex flex-col gap-6">
-                <BuyerDashboard user={session.user} />
+                {/* QA / Dev Testing Role Toggler */}
+                <DashboardTestingToggler
+                    currentDbRole={fetchedRole}
+                    activeView={activeView}
+                    onViewChange={handleViewChange}
+                    onRoleUpdated={handleRoleUpdated}
+                />
+
+                {/* Render active view according to testing toggler selection */}
+                {activeView === "buyer" && <BuyerDashboard user={session.user} />}
+                {activeView === "seller" && <SellerDashboard user={session.user} />}
+                {activeView === "admin" && <AdminDashboard user={session.user} />}
             </div>
         </div>
     );
 }
+

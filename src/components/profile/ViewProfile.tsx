@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { toast } from "react-toastify";
 import { authClient } from "@/lib/auth-client";
 import { uploadImageToImgBB } from "@/lib/imgbb";
@@ -25,10 +25,36 @@ export default function ViewProfile({ user }: ViewProfileProps) {
   
   const [isUploading, setIsUploading] = useState(false);
   const [isSavingName, setIsSavingName] = useState(false);
-  const [isSavingRole, setIsSavingRole] = useState(false);
+  const [isSubmittingRoleReq, setIsSubmittingRoleReq] = useState(false);
   const [isSavingPassword, setIsSavingPassword] = useState(false);
 
+  const [pendingRequest, setPendingRequest] = useState<any>(null);
+
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    async function loadDbData() {
+      if (!user?.id) return;
+      try {
+        const roleRes = await fetch("/api/user/role");
+        if (roleRes.ok) {
+          const roleData = await roleRes.json();
+          if (roleData.role) {
+            setRole(roleData.role);
+          }
+        }
+
+        const reqRes = await fetch("/api/user/role-request");
+        if (reqRes.ok) {
+          const reqData = await reqRes.json();
+          setPendingRequest(reqData.request || null);
+        }
+      } catch (e) {
+        console.error("Error loading user db profile data:", e);
+      }
+    }
+    loadDbData();
+  }, [user]);
 
   const handleAvatarClick = () => {
     fileInputRef.current?.click();
@@ -82,25 +108,34 @@ export default function ViewProfile({ user }: ViewProfileProps) {
     }
   };
 
-  const handleUpdateRole = async (selectedRole: string) => {
-    setIsSavingRole(true);
+  const handleRoleRequest = async (requestedRole: string) => {
+    if (requestedRole === "admin") {
+      toast.error("You cannot request to become an Administrator.");
+      return;
+    }
+    if (requestedRole === role) {
+      toast.info(`Your active account role is already ${requestedRole.toUpperCase()}.`);
+      return;
+    }
+
+    setIsSubmittingRoleReq(true);
     try {
-      const res = await fetch("/api/user/role", {
+      const res = await fetch("/api/user/role-request", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ role: selectedRole }),
+        body: JSON.stringify({ requestedRole }),
       });
+      const data = await res.json();
       if (res.ok) {
-        setRole(selectedRole);
-        toast.success(`Role updated to ${selectedRole.toUpperCase()} successfully!`);
-        window.location.reload();
+        toast.success(data.message || "Role change request submitted for Admin review!");
+        setPendingRequest({ requestedRole, status: "pending" });
       } else {
-        toast.error("Failed to update role.");
+        toast.error(data.message || "Failed to submit role change request.");
       }
     } catch (err: any) {
-      toast.error("Error updating role.");
+      toast.error("Error submitting role change request.");
     } finally {
-      setIsSavingRole(false);
+      setIsSubmittingRoleReq(false);
     }
   };
 
@@ -175,7 +210,7 @@ export default function ViewProfile({ user }: ViewProfileProps) {
             Profile Settings
           </h1>
           <p className="text-sm text-slate-500 dark:text-slate-400 max-w-xl transition-colors duration-300">
-            Manage your account credentials, avatar image, display name, and password settings.
+            Manage your account credentials, avatar image, display name, and role change requests.
           </p>
         </div>
 
@@ -210,6 +245,9 @@ export default function ViewProfile({ user }: ViewProfileProps) {
             <div>
               <h3 className="font-bold text-slate-800 dark:text-slate-100">{user.name}</h3>
               <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">{user.email}</p>
+              <span className="mt-2 inline-block px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-violet-500/10 text-violet-600 dark:text-violet-400 border border-violet-500/20">
+                Role: {role.toUpperCase()}
+              </span>
             </div>
 
             {isUploading ? (
@@ -272,61 +310,91 @@ export default function ViewProfile({ user }: ViewProfileProps) {
               </button>
             </form>
 
-            {/* Account Role Card */}
-            <div className="p-8 rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm flex flex-col gap-4">
+            {/* Account Role Change Request Card */}
+            <div className="p-8 rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm flex flex-col gap-5">
               <div>
-                <h3 className="text-lg font-bold text-slate-800 dark:text-slate-100">Account Role</h3>
+                <div className="flex items-center justify-between">
+                  <h3 className="text-lg font-bold text-slate-800 dark:text-slate-100">Account Role Change Request</h3>
+                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-violet-500/10 text-violet-600 dark:text-violet-400 border border-violet-500/20">
+                    Active Role: {role.toUpperCase()}
+                  </span>
+                </div>
                 <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-                  Choose your role on QuestForge: Buyer (gaming & shopping), Seller (game publishing & sales), or Admin.
+                  Non-admin users can submit a request to switch between Buyer and Seller roles. Role changes require Administrator review.
                 </p>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                <button
-                  type="button"
-                  onClick={() => handleUpdateRole("buyer")}
-                  disabled={isSavingRole}
-                  className={`p-4 rounded-2xl border flex flex-col items-center gap-2 text-center transition cursor-pointer ${
-                    role === "buyer"
-                      ? "border-emerald-500 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 ring-2 ring-emerald-500/30 font-bold"
-                      : "border-slate-200 dark:border-slate-800 hover:border-slate-400 text-slate-600 dark:text-slate-300"
-                  }`}
-                >
-                  <span className="text-2xl">🎮</span>
-                  <span className="font-bold text-xs">Buyer</span>
-                  <span className="text-[10px] text-slate-500 opacity-80">Browse, buy & play games</span>
-                </button>
+              {pendingRequest && (
+                <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-2">
+                    <span className="text-amber-500 text-lg">⏳</span>
+                    <div>
+                      <p className="text-xs font-bold text-slate-800 dark:text-slate-200">
+                        Role Change Request Pending
+                      </p>
+                      <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                        Requested role: <span className="font-extrabold uppercase text-amber-600">{pendingRequest.requestedRole}</span>. Waiting for Admin approval.
+                      </p>
+                    </div>
+                  </div>
+                  <span className="px-2.5 py-1 rounded-lg text-[10px] font-black uppercase bg-amber-500 text-slate-950">
+                    Pending Review
+                  </span>
+                </div>
+              )}
 
-                <button
-                  type="button"
-                  onClick={() => handleUpdateRole("seller")}
-                  disabled={isSavingRole}
-                  className={`p-4 rounded-2xl border flex flex-col items-center gap-2 text-center transition cursor-pointer ${
-                    role === "seller"
-                      ? "border-amber-500 bg-amber-500/10 text-amber-600 dark:text-amber-400 ring-2 ring-amber-500/30 font-bold"
-                      : "border-slate-200 dark:border-slate-800 hover:border-slate-400 text-slate-600 dark:text-slate-300"
-                  }`}
-                >
-                  <span className="text-2xl">🚀</span>
-                  <span className="font-bold text-xs">Seller</span>
-                  <span className="text-[10px] text-slate-500 opacity-80">Publish & sell your games</span>
-                </button>
+              {role === "admin" ? (
+                <div className="p-4 rounded-2xl bg-violet-500/10 border border-violet-500/20 text-xs text-violet-700 dark:text-violet-300 font-semibold flex items-center gap-2">
+                  <span>⚡</span> You possess Administrator clearance. Role request submission is not applicable.
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  {/* Buyer Request Option */}
+                  <button
+                    type="button"
+                    onClick={() => handleRoleRequest("buyer")}
+                    disabled={isSubmittingRoleReq || role === "buyer"}
+                    className={`p-4 rounded-2xl border flex flex-col items-center gap-2 text-center transition cursor-pointer ${
+                      role === "buyer"
+                        ? "border-emerald-500/40 bg-emerald-500/5 text-emerald-600 dark:text-emerald-400 font-bold opacity-60 cursor-not-allowed"
+                        : "border-slate-200 dark:border-slate-800 hover:border-emerald-500 hover:bg-emerald-500/5 text-slate-600 dark:text-slate-300"
+                    }`}
+                  >
+                    <span className="text-2xl">🎮</span>
+                    <span className="font-bold text-xs">Request Buyer</span>
+                    <span className="text-[10px] text-slate-500">
+                      {role === "buyer" ? "(Current Role)" : "Request Buyer Role"}
+                    </span>
+                  </button>
 
-                <button
-                  type="button"
-                  onClick={() => handleUpdateRole("admin")}
-                  disabled={isSavingRole}
-                  className={`p-4 rounded-2xl border flex flex-col items-center gap-2 text-center transition cursor-pointer ${
-                    role === "admin"
-                      ? "border-violet-500 bg-violet-500/10 text-violet-600 dark:text-violet-400 ring-2 ring-violet-500/30 font-bold"
-                      : "border-slate-200 dark:border-slate-800 hover:border-slate-400 text-slate-600 dark:text-slate-300"
-                  }`}
-                >
-                  <span className="text-2xl">⚡</span>
-                  <span className="font-bold text-xs">Admin</span>
-                  <span className="text-[10px] text-slate-500 opacity-80">Full administrative control</span>
-                </button>
-              </div>
+                  {/* Seller Request Option */}
+                  <button
+                    type="button"
+                    onClick={() => handleRoleRequest("seller")}
+                    disabled={isSubmittingRoleReq || role === "seller"}
+                    className={`p-4 rounded-2xl border flex flex-col items-center gap-2 text-center transition cursor-pointer ${
+                      role === "seller"
+                        ? "border-amber-500/40 bg-amber-500/5 text-amber-600 dark:text-amber-400 font-bold opacity-60 cursor-not-allowed"
+                        : "border-slate-200 dark:border-slate-800 hover:border-amber-500 hover:bg-amber-500/5 text-slate-600 dark:text-slate-300"
+                    }`}
+                  >
+                    <span className="text-2xl">🚀</span>
+                    <span className="font-bold text-xs">Request Seller</span>
+                    <span className="text-[10px] text-slate-500">
+                      {role === "seller" ? "(Current Role)" : "Apply for Seller"}
+                    </span>
+                  </button>
+
+                  {/* Admin Request Option - Strictly Disabled */}
+                  <div className="p-4 rounded-2xl border border-rose-500/20 bg-rose-500/5 flex flex-col items-center gap-2 text-center text-rose-500 opacity-60 cursor-not-allowed">
+                    <span className="text-2xl">🔒</span>
+                    <span className="font-bold text-xs">Admin (Forbidden)</span>
+                    <span className="text-[9px] text-rose-400 font-semibold">
+                      Cannot request Admin role
+                    </span>
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Change Password Form */}

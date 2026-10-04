@@ -22,6 +22,23 @@ interface MockUser {
 
 function useAuthSession() {
   const { data: session, isPending } = authClient.useSession();
+  const [dbRole, setDbRole] = useState<string>("buyer");
+
+  useEffect(() => {
+    async function fetchRole() {
+      if (session?.user) {
+        try {
+          const res = await fetch("/api/user/role");
+          if (res.ok) {
+            const data = await res.json();
+            if (data.role) setDbRole(data.role);
+          }
+        } catch (e) {}
+      }
+    }
+    fetchRole();
+  }, [session]);
+
   const isLoggedIn = !!session;
   const user: MockUser | null = session?.user
     ? {
@@ -29,7 +46,7 @@ function useAuthSession() {
       name: session.user.name,
       email: session.user.email,
       avatar: session.user.image || "",
-      role: (session.user as any).role || "buyer",
+      role: dbRole || (session.user as any).role || "buyer",
     }
     : null;
 
