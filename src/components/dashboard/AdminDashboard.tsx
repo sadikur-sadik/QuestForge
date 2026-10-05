@@ -1481,10 +1481,22 @@ export default function AdminDashboard({ user, defaultTab }: AdminDashboardProps
 
                             {/* Cover Image Upload & URL */}
                             <div className="flex flex-col gap-2">
-                                <label className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">Cover Image Artwork</label>
-                                {(editGameCoverPreview || editGameCoverUrl) && (
-                                    <div className="relative w-full h-36 rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800 bg-slate-950">
-                                        <img src={editGameCoverPreview || editGameCoverUrl} alt="Preview" className="w-full h-full object-cover" />
+                                <div className="flex items-center justify-between">
+                                    <label className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">Cover Image Artwork</label>
+                                    <span className="text-[11px] font-semibold text-violet-600 dark:text-violet-400">Card Frame (16:9 Ratio)</span>
+                                </div>
+                                {(editGameCoverPreview || editGameCoverUrl) ? (
+                                    <div className="group relative p-[1px] rounded-2xl overflow-hidden bg-gradient-to-b from-slate-200 to-slate-300 dark:from-slate-700/60 dark:to-slate-900/40 hover:from-violet-500 hover:to-cyan-500 transition-all duration-300 shadow-md">
+                                        <div className="relative w-full aspect-video rounded-[15px] overflow-hidden bg-slate-950">
+                                            <img src={editGameCoverPreview || editGameCoverUrl} alt="Preview" className="w-full h-full object-cover object-center transition-transform duration-500 group-hover:scale-103" />
+                                            <div className="absolute top-3 left-3 px-2.5 py-1 rounded-lg font-extrabold text-[10px] uppercase tracking-wider bg-violet-600/90 text-white shadow-md border border-violet-400/30 backdrop-blur-md">
+                                                {editGameGenre || "CARD PREVIEW"}
+                                            </div>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div className="w-full aspect-video rounded-2xl border-2 border-dashed border-slate-300 dark:border-slate-800 bg-slate-100/50 dark:bg-slate-950/40 flex flex-col items-center justify-center p-4 text-center">
+                                        <span className="text-xs font-bold text-slate-500">No artwork selected</span>
                                     </div>
                                 )}
                                 <div className="flex flex-col sm:flex-row items-center gap-2">

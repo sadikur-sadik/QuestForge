@@ -165,12 +165,12 @@ export default function MyGameCard({ game }: MyGameCardProps) {
       <div className="group relative p-[1px] rounded-3xl overflow-hidden bg-gradient-to-r from-slate-200/50 to-transparent dark:from-slate-800/40 dark:to-transparent hover:from-violet-500 hover:to-cyan-500 transition-all duration-300 shadow-md hover:shadow-lg">
         <div className="bg-[var(--color-surface)] rounded-[23px] flex flex-col md:flex-row items-center gap-5 p-5 border border-[var(--color-border)] text-[var(--color-text)] transition-colors duration-300">
           
-          {/* Left: Square Aspect cover photo */}
-          <div className="relative w-full md:w-36 h-36 rounded-2xl overflow-hidden bg-[var(--color-bg)] shrink-0 shadow-inner">
+          {/* Left: Card Aspect cover photo */}
+          <div className="relative w-full md:w-36 aspect-video md:aspect-square rounded-2xl overflow-hidden bg-[var(--color-bg)] shrink-0 shadow-inner">
             <img
               src={game.coverUrl}
               alt={game.title}
-              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-103"
+              className="w-full h-full object-cover object-center transition-transform duration-500 group-hover:scale-103"
               loading="lazy"
             />
             {/* Small Genre Overlay */}
@@ -440,29 +440,41 @@ export default function MyGameCard({ game }: MyGameCardProps) {
 
                 {/* Artwork Upload */}
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-[10px] font-bold tracking-wider uppercase text-[var(--color-muted)]">
-                    Cover Artwork
-                  </label>
+                  <div className="flex items-center justify-between">
+                    <label className="text-[10px] font-bold tracking-wider uppercase text-[var(--color-muted)]">
+                      Cover Artwork
+                    </label>
+                    <span className="text-[10px] font-semibold text-violet-500">
+                      Card Frame (16:9 Ratio)
+                    </span>
+                  </div>
                   
-                  <div className="relative w-full h-36 rounded-xl overflow-hidden border border-[var(--color-border)] bg-[var(--color-bg)]">
-                    {coverPreview && (
-                      <img src={coverPreview} alt="Cover Preview" className="w-full h-full object-cover" />
-                    )}
-                    <div className="absolute inset-0 bg-black/50 flex flex-col items-center justify-center gap-2">
-                      <input
-                        type="file"
-                        id={`modal-upload-${game.id}`}
-                        accept="image/*"
-                        onChange={handleImageChange}
-                        className="hidden"
-                        disabled={isUpdating}
-                      />
-                      <label
-                        htmlFor={`modal-upload-${game.id}`}
-                        className="px-3.5 py-2 bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white rounded-xl text-xs font-bold cursor-pointer transition-colors shadow"
-                      >
-                        Change Artwork Image
-                      </label>
+                  <div className="w-full max-w-xs mx-auto">
+                    <div className="group relative p-[1px] rounded-2xl overflow-hidden bg-gradient-to-b from-slate-200 to-slate-300 dark:from-slate-700/60 dark:to-slate-900/40 hover:from-violet-500 hover:to-cyan-500 transition-all duration-300 shadow-md">
+                      <div className="relative w-full aspect-video rounded-[15px] overflow-hidden bg-slate-950">
+                        {coverPreview && (
+                          <img src={coverPreview} alt="Cover Preview" className="w-full h-full object-cover object-center transition-transform duration-500 group-hover:scale-103" />
+                        )}
+                        <div className="absolute top-3 left-3 px-2.5 py-1 rounded-lg font-extrabold text-[10px] uppercase tracking-wider bg-violet-600/90 text-white shadow-md border border-violet-400/30 backdrop-blur-md">
+                          {genre || game.genre || "CARD PREVIEW"}
+                        </div>
+                        <div className="absolute inset-0 bg-slate-950/60 opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center gap-2 transition-opacity backdrop-blur-[2px]">
+                          <input
+                            type="file"
+                            id={`modal-upload-${game.id}`}
+                            accept="image/*"
+                            onChange={handleImageChange}
+                            className="hidden"
+                            disabled={isUpdating}
+                          />
+                          <label
+                            htmlFor={`modal-upload-${game.id}`}
+                            className="px-4 py-2 bg-violet-600 hover:bg-violet-500 text-white font-extrabold rounded-xl text-xs cursor-pointer shadow-lg hover:scale-105 transition-all"
+                          >
+                            📸 Change Artwork Image
+                          </label>
+                        </div>
+                      </div>
                     </div>
                   </div>
                   {imageError && (

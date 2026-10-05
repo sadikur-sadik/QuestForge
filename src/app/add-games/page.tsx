@@ -405,11 +405,16 @@ export default function AddGamesPage() {
 
               {/* Cover Image Upload */}
               <div className="flex flex-col gap-2 mb-2">
-                <label className="text-xs font-bold text-slate-700 dark:text-slate-300 tracking-wider uppercase opacity-85">
-                  Game Cover Image
-                </label>
+                <div className="flex items-center justify-between">
+                  <label className="text-xs font-bold text-slate-700 dark:text-slate-300 tracking-wider uppercase opacity-85">
+                    Game Cover Image
+                  </label>
+                  <span className="text-[11px] font-semibold text-violet-600 dark:text-violet-400">
+                    Card Frame (16:9 Ratio)
+                  </span>
+                </div>
                 
-                <div className="w-full">
+                <div className="w-full max-w-sm mx-auto">
                   <input
                     type="file"
                     id="cover-upload"
@@ -420,40 +425,66 @@ export default function AddGamesPage() {
                   />
 
                   {coverPreview ? (
-                    <div className="relative group w-full h-48 sm:h-56 rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800 bg-white/50 dark:bg-slate-950/40">
-                      <img
-                        src={coverPreview}
-                        alt="Game Cover Preview"
-                        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-102"
-                      />
-                      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center text-white text-xs font-bold transition-opacity duration-300 gap-2">
-                        <label htmlFor="cover-upload" className="px-3.5 py-2 bg-white/20 hover:bg-white/30 backdrop-blur-md rounded-xl cursor-pointer transition-colors">
-                          Change Artwork
-                        </label>
+                    <div className="group relative p-[1px] rounded-3xl overflow-hidden bg-gradient-to-b from-slate-200/80 to-slate-300/40 dark:from-slate-700/60 dark:to-slate-900/40 hover:from-violet-500 hover:to-cyan-500 transition-all duration-300 shadow-md">
+                      <div className="relative w-full aspect-video rounded-[23px] overflow-hidden bg-slate-950 border border-slate-200/30 dark:border-slate-800/20">
+                        <img
+                          src={coverPreview}
+                          alt="Game Cover Preview"
+                          className="w-full h-full object-cover object-center transition-transform duration-500 group-hover:scale-103"
+                        />
+                        
+                        {/* Card Frame Overlay Badges */}
+                        <div className="absolute top-3 left-3 px-2.5 py-1 rounded-lg font-extrabold text-[10px] uppercase tracking-wider bg-violet-600/90 text-white shadow-md border border-violet-400/30 backdrop-blur-md">
+                          {genre || "CARD PREVIEW"}
+                        </div>
+                        {price !== "" && !isNaN(Number(price)) && (
+                          <div className="absolute bottom-3 right-3 px-3 py-1.5 rounded-xl font-extrabold text-white text-xs bg-slate-950/80 backdrop-blur-md shadow-md border border-white/10">
+                            {Number(price) === 0 ? "Free" : `$${Number(price).toFixed(2)}`}
+                          </div>
+                        )}
+
+                        {/* Hover Overlay Controls */}
+                        <div className="absolute inset-0 bg-slate-950/60 opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center text-white text-xs font-bold transition-opacity duration-300 gap-3 backdrop-blur-[2px]">
+                          <label htmlFor="cover-upload" className="px-4 py-2 bg-violet-600 hover:bg-violet-500 text-white rounded-xl cursor-pointer font-extrabold shadow-lg hover:scale-105 active:scale-95 transition-all">
+                            📸 Change Artwork Image
+                          </label>
+                        </div>
+                        
+                        <button
+                          type="button"
+                          onClick={handleRemoveCover}
+                          className="absolute top-3 right-3 bg-rose-500/90 hover:bg-rose-600 text-white rounded-full p-2 shadow-lg hover:scale-110 active:scale-95 transition-all cursor-pointer border border-white/20 z-10"
+                          title="Remove Artwork"
+                          disabled={isLoading}
+                        >
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" />
+                          </svg>
+                        </button>
                       </div>
-                      <button
-                        type="button"
-                        onClick={handleRemoveCover}
-                        className="absolute top-3 right-3 bg-rose-500 hover:bg-rose-600 text-white rounded-full p-1.5 shadow-md hover:scale-105 active:scale-95 transition-all cursor-pointer border border-white dark:border-slate-900"
-                        title="Remove Artwork"
-                        disabled={isLoading}
-                      >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                      </button>
                     </div>
                   ) : (
                     <label
                       htmlFor="cover-upload"
-                      className="group flex flex-col items-center justify-center w-full h-48 sm:h-56 rounded-2xl border-2 border-dashed border-slate-200 dark:border-slate-800 hover:border-violet-500 dark:hover:border-violet-500 bg-white/30 dark:bg-slate-950/20 hover:bg-white/50 dark:hover:bg-slate-950/30 transition-all duration-300 cursor-pointer text-center px-6"
+                      className="group relative block p-[1px] rounded-3xl overflow-hidden cursor-pointer transition-all duration-300 shadow-sm hover:shadow-lg"
                     >
-                      <div className="flex flex-col items-center justify-center text-slate-400 group-hover:text-violet-500">
-                        <svg className="w-10 h-10 mb-2.5 opacity-65 group-hover:opacity-100 group-hover:scale-110 transition-all duration-300" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                        </svg>
-                        <span className="text-sm font-bold opacity-80 leading-normal">Upload Cover Image</span>
-                        <span className="text-xs opacity-60 mt-1">PNG, JPG, WebP up to 5MB</span>
+                      <div className="w-full aspect-video rounded-[23px] border-2 border-dashed border-slate-300 dark:border-slate-800 group-hover:border-violet-500 dark:group-hover:border-violet-500 bg-slate-100/50 dark:bg-slate-950/40 group-hover:bg-violet-500/5 dark:group-hover:bg-violet-500/10 transition-all duration-300 flex flex-col items-center justify-center p-5 text-center">
+                        <div className="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 group-hover:text-violet-500 dark:group-hover:text-violet-400 transition-colors">
+                          <div className="w-10 h-10 mb-2 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 group-hover:border-violet-500/40 group-hover:scale-110 flex items-center justify-center shadow-md transition-all duration-300">
+                            <svg className="w-5 h-5 text-violet-500" fill="none" stroke="currentColor" strokeWidth="1.75" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                          </div>
+                          <span className="text-xs font-extrabold text-slate-800 dark:text-slate-200 group-hover:text-violet-600 dark:group-hover:text-violet-400 transition-colors">
+                            Click to Upload Cover Image
+                          </span>
+                          <span className="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5 font-medium">
+                            Compact Card Frame (16:9 ratio)
+                          </span>
+                        </div>
+                        <div className="absolute top-2.5 left-2.5 px-2 py-0.5 rounded-lg font-extrabold text-[8px] uppercase tracking-wider bg-slate-200/80 dark:bg-slate-800/80 text-slate-600 dark:text-slate-400 border border-slate-300/50 dark:border-slate-700/50">
+                          Card Frame Preview
+                        </div>
                       </div>
                     </label>
                   )}

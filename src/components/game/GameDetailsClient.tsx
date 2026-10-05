@@ -7,6 +7,8 @@ import { authClient } from "@/lib/auth-client";
 import { getWishlist, addToWishlist, removeFromWishlist } from "@/lib/fetch/wishlist";
 import { getLibrary, addToLibrary } from "@/lib/fetch/library";
 import { getReviews, addReview } from "@/lib/fetch/reviews";
+import { getOrders } from "@/lib/fetch/orders";
+import { mutate } from "@/lib/mutation/api";
 import {
   BarChart,
   Bar,
@@ -54,6 +56,8 @@ export default function GameDetailsClient({ game }: GameDetailsClientProps) {
   const { data: session } = authClient.useSession();
   const [wishlisted, setWishlisted] = useState(false);
   const [owned, setOwned] = useState(false);
+  const [orderPending, setOrderPending] = useState(false);
+  const [isPlacingOrder, setIsPlacingOrder] = useState(false);
   
   // Interactive reviews state (empty by default, loaded from backend)
   const [reviews, setReviews] = useState<Review[]>([]);
@@ -62,7 +66,7 @@ export default function GameDetailsClient({ game }: GameDetailsClientProps) {
   const [newReviewRating, setNewReviewRating] = useState(5);
   const [newReviewComment, setNewReviewComment] = useState("");
 
-  // Fetch initial reviews, wishlist, and library status from the backend
+  // Fetch initial reviews, wishlist, library status, and order status
   useEffect(() => {
     // Load reviews
     getReviews(game.id)
@@ -91,6 +95,16 @@ export default function GameDetailsClient({ game }: GameDetailsClientProps) {
         setOwned(library.some((item: any) => item.gameId === game.id));
       })
       .catch((err) => console.error("Failed to load library owned games:", err));
+
+    // Check if pending order request exists
+    getOrders({ buyerId: session.user.id })
+      .then(orders => {
+        if (Array.isArray(orders)) {
+          const hasPending = orders.some((o: any) => o.gameId === game.id && o.status === "pending");
+          setOrderPending(hasPending);
+        }
+      })
+      .catch((err) => console.error("Failed to check pending orders:", err));
   }, [game.id, session?.user?.id]);
 
   // Handle Add to Wishlist via Backend API
@@ -102,12 +116,10 @@ export default function GameDetailsClient({ game }: GameDetailsClientProps) {
 
     try {
       if (wishlisted) {
-        // Remove from database wishlist
         await removeFromWishlist(session.user.id, game.id);
         setWishlisted(false);
         toast.success(`Removed "${game.title}" from your wishlist.`);
       } else {
-        // Add to database wishlist
         await addToWishlist(session.user.id, session.user.email, game.id, game);
         setWishlisted(true);
         toast.success(`Added "${game.title}" to your wishlist!`);
@@ -120,36 +132,47 @@ export default function GameDetailsClient({ game }: GameDetailsClientProps) {
     }
   };
 
-  // Handle Buy Now (Unlock Key)
-  const handleBuyNow = async () => {
+  // Handle Place Order Request (Buyer orders -> Seller delivers)
+  const handlePlaceOrderRequest = async () => {
     if (owned) {
       toast.info(`You already own "${game.title}"!`);
       return;
     }
 
-    if (!session?.user) {
-      toast.warn("You must be logged in to buy games.");
+    if (orderPending) {
+      toast.info(`Your order request for "${game.title}" is already pending seller delivery.`);
       return;
     }
 
+    if (!session?.user) {
+      toast.warn("You must be logged in to order games.");
+      return;
+    }
+
+    setIsPlacingOrder(true);
     try {
-      // Add to database library
-      await addToLibrary(session.user.id, session.user.email, game.id, game);
-      setOwned(true);
+      await mutate(
+        "/orders",
+        {
+          gameId: game.id,
+          gameTitle: game.title,
+          gameCoverUrl: game.coverUrl,
+          price: game.price,
+          buyerId: session.user.id,
+          buyerName: session.user.name || "Buyer",
+          buyerEmail: session.user.email || "",
+          sellerId: game.creator?.id || "all_sellers",
+          sellerEmail: game.creator?.email || ""
+        },
+        "POST"
+      );
 
-      // Remove from wishlist database if exists
-      try {
-        await removeFromWishlist(session.user.id, game.id);
-        setWishlisted(false);
-      } catch (err) {
-        console.warn("Failed to delete wishlisted game on purchase:", err);
-      }
-
-      window.dispatchEvent(new Event("questforge_wishlist_updated"));
-      toast.success(`Congratulations! "${game.title}" has been added to your Library Vault.`);
+      setOrderPending(true);
+      toast.success(`Order request placed! The seller will deliver your license key shortly.`);
     } catch (err: any) {
-      console.error("Purchase failed:", err);
-      toast.error(err.message || "Failed to process payment.");
+      toast.error(err.message || "Failed to place order request.");
+    } finally {
+      setIsPlacingOrder(false);
     }
   };
 
@@ -376,14 +399,23 @@ export default function GameDetailsClient({ game }: GameDetailsClientProps) {
                 </button>
 
                 <button
-                  onClick={handleBuyNow}
+                  onClick={handlePlaceOrderRequest}
+                  disabled={owned || orderPending || isPlacingOrder}
                   className={`w-full py-3.5 rounded-2xl font-black text-sm text-white transition-all duration-250 cursor-pointer active:scale-[0.98] ${
                     owned
-                      ? "bg-gradient-to-r from-emerald-500 to-teal-500 opacity-90"
+                      ? "bg-gradient-to-r from-emerald-500 to-teal-500 opacity-90 cursor-default"
+                      : orderPending
+                      ? "bg-gradient-to-r from-amber-500 to-orange-500 opacity-90 cursor-not-allowed"
                       : "bg-gradient-to-r from-violet-600 to-cyan-500 hover:shadow-lg hover:shadow-violet-500/20"
                   }`}
                 >
-                  {owned ? "✓ Owned (Unlocked)" : "Unlock License Key (Buy)"}
+                  {owned
+                    ? "✓ Owned (Unlocked)"
+                    : orderPending
+                    ? "⏳ Order Pending Seller Delivery"
+                    : isPlacingOrder
+                    ? "Placing Order Request..."
+                    : "🛒 Place Order Request"}
                 </button>
               </div>
             </div>

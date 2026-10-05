@@ -364,25 +364,45 @@ export default function EditGamePage() {
 
               {/* Cover Image Upload & Direct URL */}
               <div className="flex flex-col gap-3">
-                <label className="text-xs font-bold text-slate-700 dark:text-slate-300 tracking-wider uppercase opacity-85">
-                  Cover Image Artwork
-                </label>
+                <div className="flex items-center justify-between">
+                  <label className="text-xs font-bold text-slate-700 dark:text-slate-300 tracking-wider uppercase opacity-85">
+                    Cover Image Artwork
+                  </label>
+                  <span className="text-[11px] font-semibold text-violet-600 dark:text-violet-400">
+                    Card Frame (16:9 Ratio)
+                  </span>
+                </div>
                 
                 {/* Cover Preview */}
-                {(coverPreview || coverUrl) && (
-                  <div className="relative group w-full h-48 rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800 bg-slate-950">
-                    <img
-                      src={coverPreview || coverUrl}
-                      alt="Game Artwork"
-                      className="w-full h-full object-cover"
-                    />
-                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
-                      <label htmlFor="cover-edit-upload" className="px-4 py-2 bg-white/20 hover:bg-white/30 backdrop-blur-md text-white rounded-xl font-bold text-xs cursor-pointer">
-                        Change Artwork File
-                      </label>
+                <div className="w-full max-w-sm mx-auto">
+                  {(coverPreview || coverUrl) ? (
+                    <div className="group relative p-[1px] rounded-3xl overflow-hidden bg-gradient-to-b from-slate-200/80 to-slate-300/40 dark:from-slate-700/60 dark:to-slate-900/40 hover:from-violet-500 hover:to-cyan-500 transition-all duration-300 shadow-md">
+                      <div className="relative w-full aspect-video rounded-[23px] overflow-hidden bg-slate-950 border border-slate-200/30 dark:border-slate-800/20">
+                        <img
+                          src={coverPreview || coverUrl}
+                          alt="Game Artwork"
+                          className="w-full h-full object-cover object-center transition-transform duration-500 group-hover:scale-103"
+                        />
+                        <div className="absolute top-3 left-3 px-2.5 py-1 rounded-lg font-extrabold text-[10px] uppercase tracking-wider bg-violet-600/90 text-white shadow-md border border-violet-400/30 backdrop-blur-md">
+                          {genre || "CARD PREVIEW"}
+                        </div>
+                        <div className="absolute inset-0 bg-slate-950/60 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity backdrop-blur-[2px]">
+                          <label htmlFor="cover-edit-upload" className="px-4 py-2 bg-violet-600 hover:bg-violet-500 text-white font-extrabold rounded-xl text-xs cursor-pointer shadow-lg hover:scale-105 transition-all">
+                            📸 Change Artwork File
+                          </label>
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                )}
+                  ) : (
+                    <div className="w-full aspect-video rounded-3xl border-2 border-dashed border-slate-300 dark:border-slate-800 bg-slate-100/50 dark:bg-slate-950/40 flex flex-col items-center justify-center p-5 text-center">
+                      <svg className="w-8 h-8 mb-2 text-violet-500 opacity-80" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                      </svg>
+                      <span className="text-xs font-bold text-slate-700 dark:text-slate-300">Upload Image File or Paste URL Below</span>
+                      <span className="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5">Compact Card Frame (16:9 ratio)</span>
+                    </div>
+                  )}
+                </div>
 
                 <input
                   type="file"
@@ -394,7 +414,7 @@ export default function EditGamePage() {
                 />
 
                 <div className="flex flex-col sm:flex-row items-center gap-3">
-                  <label htmlFor="cover-edit-upload" className="w-full sm:w-auto px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 text-xs font-bold hover:bg-slate-200 dark:hover:bg-slate-700 transition cursor-pointer text-center">
+                  <label htmlFor="cover-edit-upload" className="w-full sm:w-auto px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 text-xs font-bold hover:bg-slate-200 dark:hover:bg-slate-700 transition cursor-pointer text-center shrink-0">
                     📁 Choose File to Upload
                   </label>
                   <span className="text-xs text-slate-400 font-bold hidden sm:inline">or</span>

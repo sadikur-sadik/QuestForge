@@ -61,9 +61,6 @@ function useAuthSession() {
 const PUBLIC_ROUTES = [
   { label: "Home", href: "/" },
   { label: "View Games", href: "/games" },
-  { label: "Add Games", href: "/add-games" },
-  { label: "My Games", href: "/my-games" },
-  { label: "My Gaming Bucket", href: "/my-bucket" },
 ];
 
 const AUTH_ROUTES = [
@@ -250,22 +247,7 @@ function ProfileDrawer({
               <Rocket width={16} height={16} />
               Role Console / Dashboard
             </Link>
-            <Link
-              href="/my-games"
-              onClick={onClose}
-              className="flex items-center gap-3 rounded-xl px-4 py-3 text-sm text-[var(--color-muted)] hover:text-[var(--color-text)] hover:bg-[var(--color-border)] transition-all duration-200"
-            >
-              <Rocket width={16} height={16} />
-              My Games
-            </Link>
-            <Link
-              href="/add-games"
-              onClick={onClose}
-              className="flex items-center gap-3 rounded-xl px-4 py-3 text-sm text-[var(--color-muted)] hover:text-[var(--color-text)] hover:bg-[var(--color-border)] transition-all duration-205"
-            >
-              <Person width={16} height={16} />
-              Add a Game
-            </Link>
+
             <Link
               href="/my-interactions"
               onClick={onClose}
