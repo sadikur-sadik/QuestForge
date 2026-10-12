@@ -28,6 +28,7 @@ export interface Game {
   platforms: string[];
   coverUrl: string;
   rating: number;
+  reviewsCount?: number;
   releaseDate: string;
   createdAt?: string;
   developer?: string;
@@ -250,14 +251,14 @@ export default function GameDetailsClient({ game }: GameDetailsClientProps) {
   const formattedPrice = game.price === 0 ? "Free" : `$${game.price.toFixed(2)}`;
 
   return (
-    <div className="relative min-h-[calc(100vh-64px)] w-full py-16 px-4 overflow-hidden bg-slate-50 dark:bg-slate-950 transition-colors duration-300">
+    <div className="relative min-h-[calc(100vh-64px)] w-full py-8 sm:py-12 lg:py-16 overflow-hidden bg-slate-50 dark:bg-slate-950 transition-colors duration-300">
       {/* Glow blobs */}
       <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
         <div className="absolute top-1/4 left-[-10%] w-[350px] h-[350px] rounded-full bg-violet-600/10 blur-[120px]" />
         <div className="absolute bottom-1/4 right-[-10%] w-[450px] h-[450px] rounded-full bg-cyan-500/10 blur-[150px]" />
       </div>
 
-      <div className="relative z-10 max-w-6xl mx-auto flex flex-col gap-10">
+      <div className="relative z-10 qf-container flex flex-col gap-6 sm:gap-10">
         
         {/* Navigation Breadcrumb */}
         <Link 
@@ -268,11 +269,11 @@ export default function GameDetailsClient({ game }: GameDetailsClientProps) {
         </Link>
 
         {/* Hero Section Container */}
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
           
           {/* Left Block: Image & Meta */}
-          <div className="md:col-span-5 flex flex-col gap-6">
-            <div className="relative aspect-video md:aspect-[4/5] rounded-3xl overflow-hidden border border-slate-200 dark:border-slate-800 shadow-xl bg-slate-900">
+          <div className="lg:col-span-5 3xl:col-span-4 flex flex-col gap-4 sm:gap-6 lg:sticky lg:top-24">
+            <div className="relative aspect-video lg:aspect-[4/5] rounded-3xl overflow-hidden border border-slate-200 dark:border-slate-800 shadow-xl bg-slate-900">
               <img 
                 src={game.coverUrl} 
                 alt={game.title} 
@@ -320,23 +321,38 @@ export default function GameDetailsClient({ game }: GameDetailsClientProps) {
           </div>
 
           {/* Right Block: Content, Chart, Actions */}
-          <div className="md:col-span-7 flex flex-col gap-6">
+          <div className="lg:col-span-7 3xl:col-span-8 flex flex-col gap-4 sm:gap-6 min-w-0">
             
             {/* Game Info Details Card */}
-            <div className="p-6 sm:p-8 rounded-3xl border border-slate-200/60 dark:border-slate-800 bg-white/70 dark:bg-slate-900/50 backdrop-blur-md flex flex-col gap-5">
+            <div className="p-5 sm:p-8 rounded-3xl border border-slate-200/60 dark:border-slate-800 bg-white/70 dark:bg-slate-900/50 backdrop-blur-md flex flex-col gap-5">
               <div className="flex flex-col gap-2">
-                <h1 className="text-2xl sm:text-4xl font-black text-slate-950 dark:text-white leading-tight">
+                <h1 className="text-2xl sm:text-4xl 3xl:text-5xl font-black text-slate-950 dark:text-white leading-tight break-words">
                   {game.title}
                 </h1>
                 <div className="flex flex-wrap items-center gap-3 mt-1">
-                  <div className="flex items-center gap-1 text-amber-500 text-sm font-extrabold">
-                    <span>★</span>
-                    <span className="text-slate-800 dark:text-white">
-                      {(game.rating ?? 5.0).toFixed(1)}
-                    </span>
-                  </div>
+                  {reviews.length > 0 || (game.reviewsCount && game.reviewsCount > 0 && game.rating > 0) ? (
+                    <div className="flex items-center gap-1.5 text-amber-500 text-sm font-extrabold">
+                      <span>★</span>
+                      <span className="text-slate-800 dark:text-white">
+                        {(reviews.length > 0
+                          ? reviews.reduce((sum, r) => sum + (Number(r.rating) || 0), 0) / reviews.length
+                          : (game.rating || 0)
+                        ).toFixed(1)}
+                      </span>
+                      <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">
+                        ({reviews.length > 0 ? reviews.length : game.reviewsCount} {
+                          (reviews.length > 0 ? reviews.length : game.reviewsCount) === 1 ? "review" : "reviews"
+                        })
+                      </span>
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-1 text-slate-400 dark:text-slate-500 text-xs font-medium">
+                      <span>★</span>
+                      <span>No reviews yet</span>
+                    </div>
+                  )}
                   <span className="text-slate-300 dark:text-slate-800">|</span>
-                  <div className="flex gap-1">
+                  <div className="flex flex-wrap gap-1">
                     {game.platforms.map((plat) => (
                       <span 
                         key={plat} 
@@ -473,10 +489,10 @@ export default function GameDetailsClient({ game }: GameDetailsClientProps) {
         </div>
 
         {/* Review Submission & Comments Section */}
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-8 mt-4">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 mt-2 sm:mt-4">
           
           {/* Write a Review Form */}
-          <div className="md:col-span-5">
+          <div className="lg:col-span-5 3xl:col-span-4">
             {owned ? (
               <div className="p-6 rounded-3xl border border-slate-200/60 dark:border-slate-800 bg-white/70 dark:bg-slate-900/50 backdrop-blur-md flex flex-col gap-4">
                 <h3 className="text-base font-black text-slate-950 dark:text-white">
@@ -523,7 +539,7 @@ export default function GameDetailsClient({ game }: GameDetailsClientProps) {
                 </form>
               </div>
             ) : (
-              <div className="p-6 rounded-3xl border border-dashed border-slate-200 dark:border-slate-800 bg-white/40 dark:bg-slate-900/20 backdrop-blur-md flex flex-col items-center justify-center text-center p-8 gap-4 min-h-[300px]">
+              <div className="rounded-3xl border border-dashed border-slate-200 dark:border-slate-800 bg-white/40 dark:bg-slate-900/20 backdrop-blur-md flex flex-col items-center justify-center text-center p-6 sm:p-8 gap-4 min-h-[220px] lg:min-h-[300px]">
                 <div className="w-12 h-12 rounded-full bg-violet-500/10 flex items-center justify-center text-violet-600 dark:text-violet-400">
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
@@ -540,27 +556,27 @@ export default function GameDetailsClient({ game }: GameDetailsClientProps) {
           </div>
 
           {/* Player Feedbacks & Comments list */}
-          <div className="md:col-span-7 flex flex-col gap-4">
+          <div className="lg:col-span-7 3xl:col-span-8 flex flex-col gap-4 min-w-0">
             <h3 className="text-base font-black text-slate-950 dark:text-white">
               Player Reviews ({reviews.length})
             </h3>
             
-            <div className="flex flex-col gap-4 max-h-[500px] overflow-y-auto pr-2">
+            <div className="grid grid-cols-1 2xl:grid-cols-2 gap-4 max-h-[600px] 3xl:max-h-[750px] overflow-y-auto pr-1 sm:pr-2">
               {reviews.map((rev) => (
                 <div 
                   key={rev.id}
-                  className="p-5 rounded-3xl border border-slate-200/50 dark:border-slate-800/80 bg-white/50 dark:bg-slate-900/30 backdrop-blur-md flex flex-col gap-2.5"
+                  className="p-4 sm:p-5 rounded-3xl border border-slate-200/50 dark:border-slate-800/80 bg-white/50 dark:bg-slate-900/30 backdrop-blur-md flex flex-col gap-2.5"
                 >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <div className="w-7 h-7 rounded-full bg-slate-200 dark:bg-slate-800 font-extrabold text-[10px] text-slate-600 dark:text-slate-400 flex items-center justify-center border border-slate-300/40 dark:border-slate-700/40">
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <div className="w-7 h-7 shrink-0 rounded-full bg-slate-200 dark:bg-slate-800 font-extrabold text-[10px] text-slate-600 dark:text-slate-400 flex items-center justify-center border border-slate-300/40 dark:border-slate-700/40">
                         {rev.author[0].toUpperCase()}
                       </div>
-                      <span className="text-xs font-bold text-slate-950 dark:text-white">
+                      <span className="text-xs font-bold text-slate-950 dark:text-white truncate">
                         {rev.author}
                       </span>
                     </div>
-                    <span className="text-[10px] text-slate-400">
+                    <span className="text-[10px] text-slate-400 shrink-0">
                       {rev.date}
                     </span>
                   </div>

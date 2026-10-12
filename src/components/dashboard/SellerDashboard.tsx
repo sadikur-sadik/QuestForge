@@ -10,6 +10,7 @@ import { getSessionToken } from "@/lib/mutation/session";
 import { uploadImageToImgBB } from "@/lib/imgbb";
 import { addGames } from "@/lib/fetch/add-games";
 import { getMyGames } from "@/lib/fetch/my-games";
+import TableSkeleton from "@/components/skeletons/TableSkeleton";
 import {
     BarChart,
     Bar,
@@ -90,6 +91,16 @@ export default function SellerDashboard({ user, defaultTab }: SellerDashboardPro
     const [ordersList, setOrdersList] = useState<SellerOrder[]>([]);
     const [isLoadingOrders, setIsLoadingOrders] = useState(true);
 
+    // Seller Backend Analytics State
+    const [sellerTimeRange, setSellerTimeRange] = useState<"7d" | "30d" | "6m" | "1y">("6m");
+    const [sellerAnalyticsData, setSellerAnalyticsData] = useState<any | null>(null);
+    const [isLoadingAnalytics, setIsLoadingAnalytics] = useState(false);
+    const [isMounted, setIsMounted] = useState(false);
+
+    useEffect(() => {
+        setIsMounted(true);
+    }, []);
+
     // ── MODAL STATES ──────────────────────────────────────────────
     // 1. Edit Game Modal State
     const [editingGame, setEditingGame] = useState<any | null>(null);
@@ -147,7 +158,7 @@ export default function SellerDashboard({ user, defaultTab }: SellerDashboardPro
             try {
                 const apiBase = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
                 const token = await getSessionToken();
-                const res = await fetch(`${apiBase}/orders?sellerId=${user.id}`, {
+                const res = await fetch(`${apiBase}/orders?sellerId=${user.id}&sellerEmail=${encodeURIComponent(user.email || "")}`, {
                     headers: {
                         "Content-Type": "application/json",
                         ...(token ? { Authorization: `Bearer ${token}` } : {})
@@ -164,9 +175,27 @@ export default function SellerDashboard({ user, defaultTab }: SellerDashboardPro
             }
         }
 
+        async function fetchSellerAnalytics() {
+            if (!user?.id && !user?.email) return;
+            setIsLoadingAnalytics(true);
+            try {
+                const apiBase = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+                const res = await fetch(`${apiBase}/analytics/seller?sellerId=${user?.id || ""}&sellerEmail=${encodeURIComponent(user?.email || "")}&timeRange=${sellerTimeRange}`);
+                if (res.ok) {
+                    const data = await res.json();
+                    setSellerAnalyticsData(data);
+                }
+            } catch (err) {
+                console.error("Error fetching seller analytics:", err);
+            } finally {
+                setIsLoadingAnalytics(false);
+            }
+        }
+
         fetchSellerGames();
         fetchSellerOrders();
-    }, [user?.id]);
+        fetchSellerAnalytics();
+    }, [user?.id, user?.email, sellerTimeRange]);
 
     // Clean up previews
     useEffect(() => {
@@ -400,25 +429,28 @@ export default function SellerDashboard({ user, defaultTab }: SellerDashboardPro
     }));
 
     return (
-        <div className="flex flex-col gap-8">
+        <div className="flex flex-col gap-6 sm:gap-8">
             {/* Header Banner */}
-            <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-amber-600 via-orange-600 to-rose-600 p-8 text-white shadow-xl">
-                <div className="absolute top-0 right-0 -mr-12 -mt-12 w-64 h-64 rounded-full bg-white/10 blur-2xl pointer-events-none" />
+            <div className="relative overflow-hidden rounded-3xl bg-slate-900 border border-slate-800/80 p-4 sm:p-6 lg:p-8 3xl:p-10 text-white shadow-2xl backdrop-blur-xl">
+                <div className="absolute -top-16 -right-16 w-64 h-64 rounded-full bg-gradient-to-br from-amber-500/15 via-orange-500/15 to-rose-500/10 blur-3xl pointer-events-none" />
+                <div className="absolute -bottom-16 -left-16 w-64 h-64 rounded-full bg-amber-500/10 blur-3xl pointer-events-none" />
                 <div className="relative z-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                    <div className="flex items-center gap-4">
-                        <div className="w-16 h-16 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center text-3xl shadow-inner">
-                            🚀
+                    <div className="flex items-center gap-3 sm:gap-4.5 min-w-0">
+                        <div className="w-11 h-11 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-br from-amber-500/20 via-orange-500/20 to-rose-500/20 border border-amber-500/30 flex items-center justify-center shrink-0 shadow-lg text-amber-400">
+                            <svg className="w-6 h-6 sm:w-7 sm:h-7" fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M15.59 14.37a6 6 0 01-5.84 7.38v-4.8m5.84-2.58a14.98 14.98 0 006.16-12.12A14.98 14.98 0 009.631 8.41m5.96 5.96a14.926 14.926 0 01-5.841 2.58m-.119-8.54a6 6 0 00-7.381 5.84h4.8m2.58-5.84a14.927 14.927 0 00-2.58 5.84m2.699 2.7c-.103.021-.207.041-.311.06a15.09 15.09 0 01-2.448-2.448 14.9 14.9 0 01.06-.312m-2.24 2.39a4.493 4.493 0 00-1.757 4.306 4.493 4.493 0 004.306-1.758M16.5 9a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z" />
+                            </svg>
                         </div>
-                        <div>
+                        <div className="min-w-0 flex-1">
                             <div className="flex items-center gap-2">
-                                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-white/20 text-white border border-white/30">
+                                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-amber-500/10 text-amber-400 border border-amber-500/25">
                                     Seller & Developer Command Center
                                 </span>
                             </div>
-                            <h1 className="text-2xl sm:text-3xl font-black mt-1">
-                                Developer Console - {user?.name || "Publisher"}
+                            <h1 className="text-lg sm:text-2xl 3xl:text-3xl font-black mt-1 text-white tracking-tight break-words">
+                                Developer Console — {user?.name || "Publisher"}
                             </h1>
-                            <p className="text-amber-100 text-xs sm:text-sm mt-0.5">
+                            <p className="text-slate-400 text-xs sm:text-sm mt-0.5 leading-relaxed">
                                 Manage listed titles, publish new games, deliver order requests, and track sales charts.
                             </p>
                         </div>
@@ -427,69 +459,77 @@ export default function SellerDashboard({ user, defaultTab }: SellerDashboardPro
             </div>
 
             {/* Seller Summary Metrics Cards */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
                 <div
                     onClick={() => switchTab("my-games")}
-                    className="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm flex items-center justify-between cursor-pointer hover:border-amber-500/50 transition"
+                    className="p-3.5 sm:p-5 3xl:p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-sm flex items-center justify-between cursor-pointer hover:border-amber-500/50 hover:shadow-md transition"
                 >
-                    <div>
-                        <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">My Listed Titles</span>
-                        <h3 className="text-2xl font-black text-slate-900 dark:text-white mt-1">{totalGamesCount}</h3>
-                        <span className="text-[10px] text-amber-600 font-semibold mt-1 inline-block">Active Games</span>
+                    <div className="min-w-0 pr-2">
+                        <span className="text-[10px] sm:text-xs font-bold text-slate-500 uppercase tracking-wider block truncate">My Listed Titles</span>
+                        <h3 className="text-lg sm:text-2xl 3xl:text-3xl font-black text-slate-900 dark:text-white mt-0.5 truncate">{totalGamesCount}</h3>
+                        <span className="text-[10px] sm:text-xs text-amber-600 dark:text-amber-400 font-semibold mt-0.5 inline-block truncate">Active Games</span>
                     </div>
-                    <div className="w-12 h-12 rounded-xl bg-amber-500/10 text-amber-600 flex items-center justify-center text-xl">
-                        🎮
+                    <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0">
+                        <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M15.59 14.37a6 6 0 01-5.84 7.38v-4.8m5.84-2.58a14.98 14.98 0 006.16-12.12A14.98 14.98 0 009.631 8.41m5.96 5.96a14.926 14.926 0 01-5.841 2.58m-.119-8.54a6 6 0 00-7.381 5.84h4.8m2.58-5.84a14.927 14.927 0 00-2.58 5.84m2.699 2.7c-.103.021-.207.041-.311.06a15.09 15.09 0 01-2.448-2.448 14.9 14.9 0 01.06-.312m-2.24 2.39a4.493 4.493 0 00-1.757 4.306 4.493 4.493 0 004.306-1.758M16.5 9a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z" />
+                        </svg>
                     </div>
                 </div>
 
                 <div
                     onClick={() => switchTab("orders")}
-                    className="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm flex items-center justify-between cursor-pointer hover:border-rose-500/50 transition"
+                    className="p-3.5 sm:p-5 3xl:p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-sm flex items-center justify-between cursor-pointer hover:border-rose-500/50 hover:shadow-md transition"
                 >
-                    <div>
-                        <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Pending Orders</span>
-                        <h3 className="text-2xl font-black text-rose-600 dark:text-rose-400 mt-1">{pendingOrders.length} Orders</h3>
-                        <span className="text-[10px] text-rose-500 font-semibold mt-1 inline-block">Awaiting Delivery</span>
+                    <div className="min-w-0 pr-2">
+                        <span className="text-[10px] sm:text-xs font-bold text-slate-500 uppercase tracking-wider block truncate">Pending Orders</span>
+                        <h3 className="text-lg sm:text-2xl 3xl:text-3xl font-black text-rose-600 dark:text-rose-400 mt-0.5 truncate">{pendingOrders.length} Orders</h3>
+                        <span className="text-[10px] sm:text-xs text-rose-500 font-semibold mt-0.5 inline-block truncate">Awaiting Delivery</span>
                     </div>
-                    <div className="w-12 h-12 rounded-xl bg-rose-500/10 text-rose-600 flex items-center justify-center text-xl">
-                        📦
+                    <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-rose-500/10 text-rose-600 dark:text-rose-400 flex items-center justify-center shrink-0">
+                        <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z" />
+                        </svg>
                     </div>
                 </div>
 
                 <div
                     onClick={() => switchTab("orders")}
-                    className="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm flex items-center justify-between cursor-pointer hover:border-emerald-500/50 transition"
+                    className="p-3.5 sm:p-5 3xl:p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-sm flex items-center justify-between cursor-pointer hover:border-emerald-500/50 hover:shadow-md transition"
                 >
-                    <div>
-                        <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Delivered Orders</span>
-                        <h3 className="text-2xl font-black text-emerald-600 dark:text-emerald-400 mt-1">{deliveredOrders.length} Orders</h3>
-                        <span className="text-[10px] text-emerald-600 font-semibold mt-1 inline-block">Completed Sales</span>
+                    <div className="min-w-0 pr-2">
+                        <span className="text-[10px] sm:text-xs font-bold text-slate-500 uppercase tracking-wider block truncate">Delivered Orders</span>
+                        <h3 className="text-lg sm:text-2xl 3xl:text-3xl font-black text-emerald-600 dark:text-emerald-400 mt-0.5 truncate">{deliveredOrders.length} Orders</h3>
+                        <span className="text-[10px] sm:text-xs text-emerald-600 dark:text-emerald-400 font-semibold mt-0.5 inline-block truncate">Completed Sales</span>
                     </div>
-                    <div className="w-12 h-12 rounded-xl bg-emerald-500/10 text-emerald-600 flex items-center justify-center text-xl">
-                        ✓
+                    <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
+                        <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
                     </div>
                 </div>
 
                 <div
                     onClick={() => switchTab("analytics")}
-                    className="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm flex items-center justify-between cursor-pointer hover:border-violet-500/50 transition"
+                    className="p-3.5 sm:p-5 3xl:p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-sm flex items-center justify-between cursor-pointer hover:border-violet-500/50 hover:shadow-md transition"
                 >
-                    <div>
-                        <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Gross Sales Revenue</span>
-                        <h3 className="text-2xl font-black text-violet-600 dark:text-violet-400 mt-1">${totalSalesRevenue.toLocaleString()}</h3>
-                        <span className="text-[10px] text-violet-500 font-semibold mt-1 inline-block">Direct Payout</span>
+                    <div className="min-w-0 pr-2">
+                        <span className="text-[10px] sm:text-xs font-bold text-slate-500 uppercase tracking-wider block truncate">Gross Sales Revenue</span>
+                        <h3 className="text-lg sm:text-2xl 3xl:text-3xl font-black text-violet-600 dark:text-violet-400 mt-0.5 truncate">${totalSalesRevenue.toLocaleString()}</h3>
+                        <span className="text-[10px] sm:text-xs text-violet-500 font-semibold mt-0.5 inline-block truncate">Direct Payout</span>
                     </div>
-                    <div className="w-12 h-12 rounded-xl bg-violet-500/10 text-violet-600 flex items-center justify-center text-xl">
-                        💰
+                    <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-violet-500/10 text-violet-600 dark:text-violet-400 flex items-center justify-center shrink-0">
+                        <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
                     </div>
                 </div>
             </div>
 
             {/* SELLER DASHBOARD ROUTE NAVIGATION TABS */}
-            <div className="flex items-center gap-2 border-b border-slate-200 dark:border-slate-800 pb-3 overflow-x-auto">
+            <div className="flex items-center gap-2 border-b border-slate-200 dark:border-slate-800 pb-3 overflow-x-auto scrollbar-none">
                 <button
                     onClick={() => switchTab("my-games")}
-                    className={`flex items-center gap-2 px-5 py-3 rounded-2xl font-extrabold text-xs sm:text-sm transition cursor-pointer ${
+                    className={`flex items-center gap-2 px-5 py-3 rounded-2xl font-extrabold text-xs sm:text-sm transition cursor-pointer whitespace-nowrap shrink-0 ${
                         activeTab === "my-games"
                             ? "bg-amber-600 text-white shadow-lg shadow-amber-600/30 scale-105"
                             : "bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-800 hover:text-slate-900 dark:hover:text-white"
@@ -501,7 +541,7 @@ export default function SellerDashboard({ user, defaultTab }: SellerDashboardPro
 
                 <button
                     onClick={() => switchTab("add-game")}
-                    className={`flex items-center gap-2 px-5 py-3 rounded-2xl font-extrabold text-xs sm:text-sm transition cursor-pointer ${
+                    className={`flex items-center gap-2 px-5 py-3 rounded-2xl font-extrabold text-xs sm:text-sm transition cursor-pointer whitespace-nowrap shrink-0 ${
                         activeTab === "add-game"
                             ? "bg-amber-600 text-white shadow-lg shadow-amber-600/30 scale-105"
                             : "bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-800 hover:text-slate-900 dark:hover:text-white"
@@ -513,7 +553,7 @@ export default function SellerDashboard({ user, defaultTab }: SellerDashboardPro
 
                 <button
                     onClick={() => switchTab("orders")}
-                    className={`flex items-center gap-2 px-5 py-3 rounded-2xl font-extrabold text-xs sm:text-sm transition cursor-pointer ${
+                    className={`flex items-center gap-2 px-5 py-3 rounded-2xl font-extrabold text-xs sm:text-sm transition cursor-pointer whitespace-nowrap shrink-0 ${
                         activeTab === "orders"
                             ? "bg-amber-600 text-white shadow-lg shadow-amber-600/30 scale-105"
                             : "bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-800 hover:text-slate-900 dark:hover:text-white"
@@ -530,7 +570,7 @@ export default function SellerDashboard({ user, defaultTab }: SellerDashboardPro
 
                 <button
                     onClick={() => switchTab("analytics")}
-                    className={`flex items-center gap-2 px-5 py-3 rounded-2xl font-extrabold text-xs sm:text-sm transition cursor-pointer ${
+                    className={`flex items-center gap-2 px-5 py-3 rounded-2xl font-extrabold text-xs sm:text-sm transition cursor-pointer whitespace-nowrap shrink-0 ${
                         activeTab === "analytics"
                             ? "bg-amber-600 text-white shadow-lg shadow-amber-600/30 scale-105"
                             : "bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-800 hover:text-slate-900 dark:hover:text-white"
@@ -543,14 +583,14 @@ export default function SellerDashboard({ user, defaultTab }: SellerDashboardPro
 
             {/* TAB 1: MY LISTED GAMES */}
             {activeTab === "my-games" && (
-                <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl flex flex-col gap-6">
+                <div className="p-4 sm:p-6 rounded-2xl sm:rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl flex flex-col gap-6">
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 dark:border-slate-800 pb-4">
                         <div>
-                            <div className="flex items-center gap-2">
-                                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-amber-500/10 text-amber-600 border border-amber-500/20">
+                            <div className="flex flex-col sm:flex-row sm:items-center items-start gap-1.5 sm:gap-2">
+                                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-amber-500/10 text-amber-600 border border-amber-500/20 w-fit shrink-0">
                                     Catalog Management
                                 </span>
-                                <h2 className="text-xl font-black text-slate-900 dark:text-white mt-0.5">
+                                <h2 className="text-lg sm:text-xl font-black text-slate-900 dark:text-white">
                                     My Published Game Listings
                                 </h2>
                             </div>
@@ -569,72 +609,133 @@ export default function SellerDashboard({ user, defaultTab }: SellerDashboardPro
                     </div>
 
                     {isLoadingGames ? (
-                        <div className="py-12 text-center text-xs text-slate-400 animate-pulse">Loading listed games from database...</div>
+                        <TableSkeleton rows={4} columns={5} hasThumbnail={true} />
                     ) : publishedGames.length === 0 ? (
                         <div className="py-8 text-center text-xs text-slate-500 border border-dashed border-slate-200 dark:border-slate-800 rounded-2xl">
                             No games listed yet. Click "Add New Game" to publish your first title.
                         </div>
                     ) : (
-                        <div className="overflow-x-auto">
-                            <table className="w-full text-left text-xs">
-                                <thead className="text-slate-400 border-b border-slate-200 dark:border-slate-800 uppercase tracking-wider text-[10px]">
-                                    <tr>
-                                        <th className="pb-3 font-bold">Game Listing</th>
-                                        <th className="pb-3 font-bold">Genre</th>
-                                        <th className="pb-3 font-bold">Price</th>
-                                        <th className="pb-3 font-bold">Platforms</th>
-                                        <th className="pb-3 font-bold text-right">Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody className="divide-y divide-slate-100 dark:divide-slate-800/50">
-                                    {publishedGames.map((game) => (
-                                        <tr key={game._id} className="hover:bg-slate-50/50 dark:hover:bg-slate-950/30 transition">
-                                            <td className="py-3 font-bold text-slate-900 dark:text-white flex items-center gap-3">
-                                                {game.coverUrl ? (
-                                                    <img src={game.coverUrl} alt={game.title} className="w-9 h-11 object-cover rounded-md shadow-sm" />
-                                                ) : (
-                                                    <div className="w-9 h-11 rounded-md bg-slate-200 dark:bg-slate-800 flex items-center justify-center text-xs">🎮</div>
-                                                )}
-                                                <div>
-                                                    <p className="font-extrabold text-sm">{game.title}</p>
-                                                    <p className="text-[10px] text-slate-400 font-normal truncate max-w-xs">{game.description}</p>
+                        <div className="flex flex-col gap-3">
+                            {/* Mobile / Tablet Card View (< lg) */}
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 lg:hidden">
+                                {publishedGames.map((game) => (
+                                    <div key={game._id} className="p-4 rounded-2xl bg-slate-50/70 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800/80 flex flex-col justify-between gap-3.5 hover:border-amber-500/30 transition shadow-sm">
+                                        <div className="flex items-start gap-3">
+                                            {game.coverUrl ? (
+                                                <img src={game.coverUrl} alt={game.title} className="w-14 h-18 object-cover rounded-xl shadow-sm shrink-0 border border-slate-200/50 dark:border-slate-800" />
+                                            ) : (
+                                                <div className="w-14 h-18 rounded-xl bg-slate-200 dark:bg-slate-800 flex items-center justify-center text-xs shrink-0 text-slate-400">
+                                                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                                                 </div>
-                                            </td>
-                                            <td className="py-3 text-slate-500 font-semibold">{game.genre}</td>
-                                            <td className="py-3 font-bold text-emerald-600 dark:text-emerald-400">${game.price}</td>
-                                            <td className="py-3 text-slate-500">
-                                                {Array.isArray(game.platforms) ? game.platforms.join(", ") : "PC"}
-                                            </td>
-                                            <td className="py-3 text-right">
-                                                <div className="flex items-center justify-end gap-2">
-                                                    <Link href={`/games/${game._id}`}>
-                                                        <button className="px-3 py-1.5 rounded-xl border border-slate-300 dark:border-slate-800 font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition text-[11px] flex items-center gap-1">
-                                                            <span>👁️</span>
-                                                            <span>Inspect</span>
-                                                        </button>
-                                                    </Link>
-
-                                                    <button
-                                                        onClick={() => handleOpenEditGame(game)}
-                                                        className="px-3 py-1.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-extrabold text-[11px] transition shadow-sm cursor-pointer flex items-center gap-1"
-                                                    >
-                                                        <span>✏️</span>
-                                                        <span>Edit</span>
-                                                    </button>
-
-                                                    <button
-                                                        onClick={() => setDeleteGameModal(game)}
-                                                        className="px-3 py-1.5 rounded-xl bg-rose-600 text-white font-extrabold hover:bg-rose-700 transition cursor-pointer text-[11px] shadow-sm flex items-center gap-1"
-                                                    >
-                                                        <span>🗑️</span>
-                                                        <span>Delete</span>
-                                                    </button>
+                                            )}
+                                            <div className="min-w-0 flex-1">
+                                                <div className="flex items-center justify-between gap-2">
+                                                    <span className="text-[10px] font-bold uppercase tracking-wider text-amber-500 dark:text-amber-400 truncate">
+                                                        {game.genre || "Catalog"}
+                                                    </span>
+                                                    <span className="text-sm font-black text-emerald-600 dark:text-emerald-400 shrink-0">
+                                                        ${game.price}
+                                                    </span>
                                                 </div>
-                                            </td>
+                                                <h3 className="font-extrabold text-sm text-slate-900 dark:text-white truncate mt-0.5">{game.title}</h3>
+                                                <p className="text-[11px] text-slate-400 dark:text-slate-500 line-clamp-2 mt-1">{game.description}</p>
+                                                <div className="mt-2 text-[10px] text-slate-500 dark:text-slate-400 flex items-center gap-1.5 flex-wrap">
+                                                    <span className="px-2 py-0.5 rounded-md bg-slate-200/60 dark:bg-slate-800/80 font-semibold">
+                                                        {Array.isArray(game.platforms) ? game.platforms.join(", ") : "PC"}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="grid grid-cols-3 gap-1.5 pt-2 border-t border-slate-200/60 dark:border-slate-800/60">
+                                            <Link href={`/games/${game._id}`} className="w-full">
+                                                <button className="w-full py-1.5 px-2 rounded-xl border border-slate-200 dark:border-slate-800 font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 text-[11px] flex items-center justify-center gap-1 transition">
+                                                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                                                    <span>View</span>
+                                                </button>
+                                            </Link>
+                                            <button
+                                                onClick={() => handleOpenEditGame(game)}
+                                                className="py-1.5 px-2 rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 hover:bg-amber-500 hover:text-white font-bold text-[11px] flex items-center justify-center gap-1 transition cursor-pointer"
+                                            >
+                                                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+                                                <span>Edit</span>
+                                            </button>
+                                            <button
+                                                onClick={() => setDeleteGameModal(game)}
+                                                className="py-1.5 px-2 rounded-xl bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20 hover:bg-rose-500 hover:text-white font-bold text-[11px] flex items-center justify-center gap-1 transition cursor-pointer"
+                                            >
+                                                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                                                <span>Delete</span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+
+                            {/* Desktop Table View (>= lg) */}
+                            <div className="hidden lg:block overflow-x-auto">
+                                <table className="w-full text-left text-xs min-w-[700px] whitespace-nowrap">
+                                    <thead className="text-slate-400 border-b border-slate-200 dark:border-slate-800 uppercase tracking-wider text-[10px]">
+                                        <tr>
+                                            <th className="px-4 pb-3 font-bold">Game Listing</th>
+                                            <th className="px-4 pb-3 font-bold">Genre</th>
+                                            <th className="px-4 pb-3 font-bold">Price</th>
+                                            <th className="px-4 pb-3 font-bold">Platforms</th>
+                                            <th className="px-4 pb-3 font-bold text-right">Actions</th>
                                         </tr>
-                                    ))}
-                                </tbody>
-                            </table>
+                                    </thead>
+                                    <tbody className="divide-y divide-slate-100 dark:divide-slate-800/50">
+                                        {publishedGames.map((game) => (
+                                            <tr key={game._id} className="hover:bg-slate-50/50 dark:hover:bg-slate-950/30 transition">
+                                                <td className="px-4 py-3.5 font-bold text-slate-900 dark:text-white flex items-center gap-3">
+                                                    {game.coverUrl ? (
+                                                        <img src={game.coverUrl} alt={game.title} className="w-9 h-11 object-cover rounded-md shadow-sm border border-slate-200/50 dark:border-slate-800" />
+                                                    ) : (
+                                                        <div className="w-9 h-11 rounded-md bg-slate-200 dark:bg-slate-800 flex items-center justify-center text-xs text-slate-400">
+                                                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                                        </div>
+                                                    )}
+                                                    <div>
+                                                        <p className="font-extrabold text-sm">{game.title}</p>
+                                                        <p className="text-[10px] text-slate-400 font-normal truncate max-w-xs">{game.description}</p>
+                                                    </div>
+                                                </td>
+                                                <td className="px-4 py-3.5 text-slate-500 font-semibold">{game.genre}</td>
+                                                <td className="px-4 py-3.5 font-bold text-emerald-600 dark:text-emerald-400">${game.price}</td>
+                                                <td className="px-4 py-3.5 text-slate-500">
+                                                    {Array.isArray(game.platforms) ? game.platforms.join(", ") : "PC"}
+                                                </td>
+                                                <td className="px-4 py-3.5 text-right">
+                                                    <div className="flex items-center justify-end gap-2">
+                                                        <Link href={`/games/${game._id}`}>
+                                                            <button className="px-3 py-1.5 rounded-xl border border-slate-300 dark:border-slate-800 font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition text-[11px] flex items-center gap-1.5">
+                                                                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                                                                <span>Inspect</span>
+                                                            </button>
+                                                        </Link>
+
+                                                        <button
+                                                            onClick={() => handleOpenEditGame(game)}
+                                                            className="px-3 py-1.5 rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 hover:bg-amber-500 hover:text-white font-bold text-[11px] transition cursor-pointer flex items-center gap-1.5"
+                                                        >
+                                                            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+                                                            <span>Edit</span>
+                                                        </button>
+
+                                                        <button
+                                                            onClick={() => setDeleteGameModal(game)}
+                                                            className="px-3 py-1.5 rounded-xl bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20 hover:bg-rose-500 hover:text-white font-bold transition cursor-pointer text-[11px] flex items-center gap-1.5"
+                                                        >
+                                                            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                                                            <span>Delete</span>
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     )}
                 </div>
@@ -874,14 +975,14 @@ export default function SellerDashboard({ user, defaultTab }: SellerDashboardPro
 
             {/* TAB 3: ORDER REQUESTS & DELIVERY */}
             {activeTab === "orders" && (
-                <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl flex flex-col gap-6">
+                <div className="p-4 sm:p-6 rounded-2xl sm:rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl flex flex-col gap-6">
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 dark:border-slate-800 pb-4">
                         <div>
-                            <div className="flex items-center gap-2">
-                                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-rose-500/10 text-rose-600 border border-rose-500/20">
+                            <div className="flex flex-col sm:flex-row sm:items-center items-start gap-1.5 sm:gap-2">
+                                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-rose-500/10 text-rose-600 border border-rose-500/20 w-fit shrink-0">
                                     Order Fulfillment System
                                 </span>
-                                <h2 className="text-xl font-black text-slate-900 dark:text-white mt-0.5">
+                                <h2 className="text-lg sm:text-xl font-black text-slate-900 dark:text-white">
                                     Buyer Order Requests & Delivery
                                 </h2>
                             </div>
@@ -890,91 +991,166 @@ export default function SellerDashboard({ user, defaultTab }: SellerDashboardPro
                             </p>
                         </div>
 
-                        <span className="px-3 py-1 rounded-xl text-xs font-bold bg-amber-500/10 text-amber-600 border border-amber-500/20 w-fit">
+                        <span className="px-3 py-1 rounded-xl text-xs font-bold bg-amber-500/10 text-amber-600 border border-amber-500/20 w-fit shrink-0">
                             {pendingOrders.length} Pending Order{pendingOrders.length === 1 ? "" : "s"}
                         </span>
                     </div>
 
                     {isLoadingOrders ? (
-                        <div className="py-12 text-center text-xs text-slate-400 animate-pulse">Loading order requests from database...</div>
+                        <TableSkeleton rows={4} columns={5} hasThumbnail={true} />
                     ) : ordersList.length === 0 ? (
                         <div className="py-8 text-center text-xs text-slate-500 border border-dashed border-slate-200 dark:border-slate-800 rounded-2xl">
-                            ✨ No order requests received yet.
+                            No order requests received yet.
                         </div>
                     ) : (
-                        <div className="overflow-x-auto">
-                            <table className="w-full text-left text-xs">
-                                <thead className="text-slate-400 border-b border-slate-200 dark:border-slate-800 uppercase tracking-wider text-[10px]">
-                                    <tr>
-                                        <th className="pb-3 font-bold">Order ID</th>
-                                        <th className="pb-3 font-bold">Game Title</th>
-                                        <th className="pb-3 font-bold">Buyer Account</th>
-                                        <th className="pb-3 font-bold">Price</th>
-                                        <th className="pb-3 font-bold">Status</th>
-                                        <th className="pb-3 font-bold text-right">Delivery Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody className="divide-y divide-slate-100 dark:divide-slate-800/50">
-                                    {ordersList.map((order) => (
-                                        <tr key={order._id} className="hover:bg-slate-50/50 dark:hover:bg-slate-950/30 transition">
-                                            <td className="py-3 font-mono text-[11px] text-slate-500">
-                                                <span className="px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
-                                                    {order._id.substring(0, 8)}...
+                        <div className="flex flex-col gap-3">
+                            {/* Mobile / Tablet Card View (< lg) */}
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 lg:hidden">
+                                {ordersList.map((order) => (
+                                    <div key={order._id} className="p-4 rounded-2xl bg-slate-50/70 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800/80 flex flex-col justify-between gap-3.5 hover:border-amber-500/30 transition shadow-sm">
+                                        <div className="flex items-start justify-between gap-2 border-b border-slate-200/60 dark:border-slate-800/60 pb-2.5">
+                                            <div className="flex items-center gap-2">
+                                                <span className="font-mono text-[10px] bg-slate-200/80 dark:bg-slate-800 text-slate-700 dark:text-slate-300 px-2 py-0.5 rounded-md font-bold">
+                                                    #{order._id.substring(0, 8)}
                                                 </span>
-                                            </td>
+                                            </div>
+                                            <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider ${
+                                                order.status === "delivered"
+                                                    ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20"
+                                                    : "bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20"
+                                            }`}>
+                                                {order.status === "delivered" ? "Delivered" : "Pending"}
+                                            </span>
+                                        </div>
 
-                                            <td className="py-3 font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                                                {order.gameCoverUrl ? (
-                                                    <img src={order.gameCoverUrl} alt={order.gameTitle} className="w-7 h-9 object-cover rounded shadow-sm" />
-                                                ) : (
-                                                    <div className="w-7 h-9 rounded bg-slate-200 dark:bg-slate-800 flex items-center justify-center text-[10px]">🎮</div>
-                                                )}
-                                                <span>{order.gameTitle}</span>
-                                            </td>
+                                        <div className="flex items-start gap-3">
+                                            {order.gameCoverUrl ? (
+                                                <img src={order.gameCoverUrl} alt={order.gameTitle} className="w-12 h-16 object-cover rounded-xl shadow-sm shrink-0 border border-slate-200/50 dark:border-slate-800" />
+                                            ) : (
+                                                <div className="w-12 h-16 rounded-xl bg-slate-200 dark:bg-slate-800 flex items-center justify-center text-xs shrink-0 text-slate-400">
+                                                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                                </div>
+                                            )}
+                                            <div className="min-w-0 flex-1">
+                                                <div className="flex items-center justify-between gap-2">
+                                                    <h3 className="font-extrabold text-sm text-slate-900 dark:text-white truncate">{order.gameTitle}</h3>
+                                                    <span className="text-sm font-black text-emerald-600 dark:text-emerald-400 shrink-0">
+                                                        ${order.price}
+                                                    </span>
+                                                </div>
+                                                <div className="mt-2 text-xs">
+                                                    <p className="font-bold text-slate-800 dark:text-slate-200 truncate">{order.buyerName || "Buyer"}</p>
+                                                    <p className="text-[11px] text-slate-400 dark:text-slate-500 truncate">{order.buyerEmail}</p>
+                                                </div>
+                                            </div>
+                                        </div>
 
-                                            <td className="py-3">
-                                                <p className="font-bold text-slate-900 dark:text-white">{order.buyerName || "Buyer"}</p>
-                                                <p className="text-[10px] text-slate-500">{order.buyerEmail}</p>
-                                            </td>
+                                        <div className="pt-2 border-t border-slate-200/60 dark:border-slate-800/60">
+                                            {order.status === "pending" ? (
+                                                <button
+                                                    onClick={() => {
+                                                        setDeliverOrderModal(order);
+                                                        setCustomLicenseKey("");
+                                                        setDeliveryNotes("");
+                                                    }}
+                                                    className="w-full py-2 px-3 rounded-xl bg-gradient-to-r from-amber-600 to-rose-600 hover:opacity-95 text-white font-extrabold text-xs transition shadow-md cursor-pointer flex items-center justify-center gap-1.5"
+                                                >
+                                                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" /></svg>
+                                                    <span>Deliver License Key</span>
+                                                </button>
+                                            ) : (
+                                                <div className="p-2.5 rounded-xl bg-emerald-500/5 border border-emerald-500/20 flex flex-col gap-1">
+                                                    <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold flex items-center gap-1">
+                                                        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" /></svg>
+                                                        Delivered License Key:
+                                                    </span>
+                                                    <span className="font-mono text-[11px] font-bold text-slate-800 dark:text-slate-200 select-all truncate">
+                                                        {order.licenseKey || "QF-LICENSE-KEY"}
+                                                    </span>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
 
-                                            <td className="py-3 font-bold text-emerald-600 dark:text-emerald-400">${order.price}</td>
-
-                                            <td className="py-3">
-                                                <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase ${
-                                                    order.status === "delivered"
-                                                        ? "bg-emerald-500/10 text-emerald-600 border border-emerald-500/20"
-                                                        : "bg-rose-500/10 text-rose-600 border border-rose-500/20"
-                                                }`}>
-                                                    {order.status === "delivered" ? "✓ Delivered" : "⏳ Pending"}
-                                                </span>
-                                            </td>
-
-                                            <td className="py-3 text-right">
-                                                {order.status === "pending" ? (
-                                                    <button
-                                                        onClick={() => {
-                                                            setDeliverOrderModal(order);
-                                                            setCustomLicenseKey("");
-                                                            setDeliveryNotes("");
-                                                        }}
-                                                        className="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-amber-600 to-rose-600 hover:opacity-90 text-white font-extrabold text-[11px] transition shadow-md cursor-pointer flex items-center gap-1 ml-auto"
-                                                    >
-                                                        <span>🚀</span>
-                                                        <span>Deliver Order</span>
-                                                    </button>
-                                                ) : (
-                                                    <div className="text-right">
-                                                        <span className="text-[10px] text-emerald-600 font-bold block">Key Delivered:</span>
-                                                        <span className="font-mono text-[10px] bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 px-2 py-0.5 rounded border border-emerald-500/20">
-                                                            {order.licenseKey || "QF-LICENSE-KEY"}
-                                                        </span>
-                                                    </div>
-                                                )}
-                                            </td>
+                            {/* Desktop Table View (>= lg) */}
+                            <div className="hidden lg:block overflow-x-auto">
+                                <table className="w-full text-left text-xs min-w-[700px] whitespace-nowrap">
+                                    <thead className="text-slate-400 border-b border-slate-200 dark:border-slate-800 uppercase tracking-wider text-[10px]">
+                                        <tr>
+                                            <th className="px-4 pb-3 font-bold">Order ID</th>
+                                            <th className="px-4 pb-3 font-bold">Game Title</th>
+                                            <th className="px-4 pb-3 font-bold">Buyer Account</th>
+                                            <th className="px-4 pb-3 font-bold">Price</th>
+                                            <th className="px-4 pb-3 font-bold">Status</th>
+                                            <th className="px-4 pb-3 font-bold text-right">Delivery Action</th>
                                         </tr>
-                                    ))}
-                                </tbody>
-                            </table>
+                                    </thead>
+                                    <tbody className="divide-y divide-slate-100 dark:divide-slate-800/50">
+                                        {ordersList.map((order) => (
+                                            <tr key={order._id} className="hover:bg-slate-50/50 dark:hover:bg-slate-950/30 transition">
+                                                <td className="px-4 py-3.5 font-mono text-[11px] text-slate-500">
+                                                    <span className="px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
+                                                        {order._id.substring(0, 8)}...
+                                                    </span>
+                                                </td>
+
+                                                <td className="px-4 py-3.5 font-bold text-slate-900 dark:text-white flex items-center gap-2.5">
+                                                    {order.gameCoverUrl ? (
+                                                        <img src={order.gameCoverUrl} alt={order.gameTitle} className="w-7 h-9 object-cover rounded shadow-sm border border-slate-200/50 dark:border-slate-800" />
+                                                    ) : (
+                                                        <div className="w-7 h-9 rounded bg-slate-200 dark:bg-slate-800 flex items-center justify-center text-[10px] text-slate-400">
+                                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                                        </div>
+                                                    )}
+                                                    <span>{order.gameTitle}</span>
+                                                </td>
+
+                                                <td className="px-4 py-3.5">
+                                                    <p className="font-bold text-slate-900 dark:text-white">{order.buyerName || "Buyer"}</p>
+                                                    <p className="text-[10px] text-slate-500">{order.buyerEmail}</p>
+                                                </td>
+
+                                                <td className="px-4 py-3.5 font-bold text-emerald-600 dark:text-emerald-400">${order.price}</td>
+
+                                                <td className="px-4 py-3.5">
+                                                    <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase ${
+                                                        order.status === "delivered"
+                                                            ? "bg-emerald-500/10 text-emerald-600 border border-emerald-500/20"
+                                                            : "bg-rose-500/10 text-rose-600 border border-rose-500/20"
+                                                    }`}>
+                                                        {order.status === "delivered" ? "Delivered" : "Pending"}
+                                                    </span>
+                                                </td>
+
+                                                <td className="px-4 py-3.5 text-right">
+                                                    {order.status === "pending" ? (
+                                                        <button
+                                                            onClick={() => {
+                                                                setDeliverOrderModal(order);
+                                                                setCustomLicenseKey("");
+                                                                setDeliveryNotes("");
+                                                            }}
+                                                            className="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-amber-600 to-rose-600 hover:opacity-90 text-white font-extrabold text-[11px] transition shadow-md cursor-pointer flex items-center gap-1.5 ml-auto"
+                                                        >
+                                                            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" /></svg>
+                                                            <span>Deliver Order</span>
+                                                        </button>
+                                                    ) : (
+                                                        <div className="text-right">
+                                                            <span className="text-[10px] text-emerald-600 font-bold block">Key Delivered:</span>
+                                                            <span className="font-mono text-[10px] bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 px-2 py-0.5 rounded border border-emerald-500/20 font-bold inline-block">
+                                                                {order.licenseKey || "QF-LICENSE-KEY"}
+                                                            </span>
+                                                        </div>
+                                                    )}
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     )}
                 </div>
@@ -983,16 +1159,35 @@ export default function SellerDashboard({ user, defaultTab }: SellerDashboardPro
             {/* TAB 4: RECHARTS ANALYTICS */}
             {activeTab === "analytics" && (
                 <div className="flex flex-col gap-6">
-                    <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl flex flex-col gap-2">
-                        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-violet-500/10 text-violet-600 dark:text-violet-400 border border-violet-500/20 w-fit">
-                            Seller Analytics Board
-                        </span>
-                        <h2 className="text-xl font-black text-slate-900 dark:text-white">
-                            Publisher Revenue & Fulfillment Performance
-                        </h2>
-                        <p className="text-xs text-slate-500">
-                            Real-time graphs of monthly sales volume, order deliveries, and catalog genre ratios.
-                        </p>
+                    <div className="p-4 sm:p-6 rounded-2xl sm:rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-4">
+                        <div className="flex flex-col gap-2">
+                            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-violet-500/10 text-violet-600 dark:text-violet-400 border border-violet-500/20 w-fit">
+                                Seller Analytics Board
+                            </span>
+                            <h2 className="text-lg sm:text-xl font-black text-slate-900 dark:text-white">
+                                Publisher Revenue & Fulfillment Performance
+                            </h2>
+                            <p className="text-xs text-slate-500">
+                                Real-time dynamic charts of sales volume, units sold, order fulfillment timeline, and catalog genre ratios.
+                            </p>
+                        </div>
+
+                        {/* Dynamic Time Range Filter Controls */}
+                        <div className="flex items-center gap-1.5 bg-slate-100 dark:bg-slate-950 p-1.5 rounded-2xl border border-slate-200 dark:border-slate-800 self-start md:self-auto shrink-0">
+                            {(["7d", "30d", "6m", "1y"] as const).map((range) => (
+                                <button
+                                    key={range}
+                                    onClick={() => setSellerTimeRange(range)}
+                                    className={`px-3 py-1.5 rounded-xl font-extrabold text-xs uppercase transition cursor-pointer ${
+                                        sellerTimeRange === range
+                                            ? "bg-violet-600 text-white shadow-md shadow-violet-600/30"
+                                            : "text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
+                                    }`}
+                                >
+                                    {range}
+                                </button>
+                            ))}
+                        </div>
                     </div>
 
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -1004,27 +1199,33 @@ export default function SellerDashboard({ user, defaultTab }: SellerDashboardPro
                                     Revenue Chart
                                 </span>
                                 <h3 className="text-lg font-extrabold text-slate-900 dark:text-white mt-1">
-                                    Monthly Gross Sales Revenue ($)
+                                    Gross Sales Revenue ($)
                                 </h3>
                             </div>
 
-                            <div className="w-full h-72">
-                                <ResponsiveContainer width="100%" height="100%">
-                                    <BarChart data={monthlySalesData} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
-                                        <CartesianGrid strokeDasharray="3 3" opacity={0.15} />
-                                        <XAxis dataKey="month" tick={{ fontSize: 11 }} />
-                                        <YAxis tick={{ fontSize: 11 }} />
-                                        <Tooltip contentStyle={{ backgroundColor: "#0f172a", borderRadius: "12px", border: "1px solid #334155", color: "#fff" }} />
-                                        <Legend />
-                                        <Bar dataKey="revenue" name="Sales Revenue ($)" fill="#10b981" radius={[6, 6, 0, 0]} />
-                                        <Bar dataKey="orders" name="Units Sold" fill="#f59e0b" radius={[6, 6, 0, 0]} />
-                                    </BarChart>
-                                </ResponsiveContainer>
+                            <div className="w-full h-72 min-h-[300px] 3xl:h-96">
+                                {isMounted ? (
+                                    <ResponsiveContainer width="100%" height={300} minWidth={0} minHeight={300}>
+                                        <BarChart data={sellerAnalyticsData?.monthlySalesData || monthlySalesData} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
+                                            <CartesianGrid strokeDasharray="3 3" opacity={0.15} />
+                                            <XAxis dataKey="month" tick={{ fontSize: 11 }} />
+                                            <YAxis tick={{ fontSize: 11 }} />
+                                            <Tooltip contentStyle={{ backgroundColor: "#0f172a", borderRadius: "12px", border: "1px solid #334155", color: "#fff" }} />
+                                            <Legend />
+                                            <Bar dataKey="revenue" name="Sales Revenue ($)" fill="#10b981" radius={[6, 6, 0, 0]} />
+                                            <Bar dataKey="orders" name="Units Sold" fill="#f59e0b" radius={[6, 6, 0, 0]} />
+                                        </BarChart>
+                                    </ResponsiveContainer>
+                                ) : (
+                                    <div className="w-full h-[300px] flex items-center justify-center text-slate-400 text-sm">
+                                        Loading dynamic chart...
+                                    </div>
+                                )}
                             </div>
                         </div>
 
                         {/* Chart 2: Order Delivery Trend (AreaChart) */}
-                        <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-lg flex flex-col gap-4">
+                        <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-lg flex flex-col gap-4 min-w-0">
                             <div>
                                 <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20">
                                     Delivery Growth Chart
@@ -1034,28 +1235,34 @@ export default function SellerDashboard({ user, defaultTab }: SellerDashboardPro
                                 </h3>
                             </div>
 
-                            <div className="w-full h-72">
-                                <ResponsiveContainer width="100%" height="100%">
-                                    <AreaChart data={monthlySalesData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                                        <defs>
-                                            <linearGradient id="colorSellerOrders" x1="0" y1="0" x2="0" y2="1">
-                                                <stop offset="5%" stopColor="#f43f5e" stopOpacity={0.8}/>
-                                                <stop offset="95%" stopColor="#f43f5e" stopOpacity={0}/>
-                                            </linearGradient>
-                                        </defs>
-                                        <CartesianGrid strokeDasharray="3 3" opacity={0.15} />
-                                        <XAxis dataKey="month" tick={{ fontSize: 11 }} />
-                                        <YAxis tick={{ fontSize: 11 }} />
-                                        <Tooltip contentStyle={{ backgroundColor: "#0f172a", borderRadius: "12px", border: "1px solid #334155", color: "#fff" }} />
-                                        <Legend />
-                                        <Area type="monotone" dataKey="orders" name="Order Deliveries" stroke="#f43f5e" fillOpacity={1} fill="url(#colorSellerOrders)" strokeWidth={3} />
-                                    </AreaChart>
-                                </ResponsiveContainer>
+                            <div className="w-full h-72 min-h-[300px] 3xl:h-96">
+                                {isMounted ? (
+                                    <ResponsiveContainer width="100%" height={300} minWidth={0} minHeight={300}>
+                                        <AreaChart data={sellerAnalyticsData?.monthlySalesData || monthlySalesData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                                            <defs>
+                                                <linearGradient id="colorSellerOrders" x1="0" y1="0" x2="0" y2="1">
+                                                    <stop offset="5%" stopColor="#f43f5e" stopOpacity={0.8}/>
+                                                    <stop offset="95%" stopColor="#f43f5e" stopOpacity={0}/>
+                                                </linearGradient>
+                                            </defs>
+                                            <CartesianGrid strokeDasharray="3 3" opacity={0.15} />
+                                            <XAxis dataKey="month" tick={{ fontSize: 11 }} />
+                                            <YAxis tick={{ fontSize: 11 }} />
+                                            <Tooltip contentStyle={{ backgroundColor: "#0f172a", borderRadius: "12px", border: "1px solid #334155", color: "#fff" }} />
+                                            <Legend />
+                                            <Area type="monotone" dataKey="orders" name="Order Deliveries" stroke="#f43f5e" fillOpacity={1} fill="url(#colorSellerOrders)" strokeWidth={3} />
+                                        </AreaChart>
+                                    </ResponsiveContainer>
+                                ) : (
+                                    <div className="w-full h-[300px] flex items-center justify-center text-slate-400 text-sm">
+                                        Loading dynamic chart...
+                                    </div>
+                                )}
                             </div>
                         </div>
 
                         {/* Chart 3: Genre Distribution (PieChart) */}
-                        <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-lg flex flex-col gap-4 lg:col-span-2">
+                        <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-lg flex flex-col gap-4 lg:col-span-2 min-w-0">
                             <div>
                                 <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-violet-500/10 text-violet-600 dark:text-violet-400 border border-violet-500/20">
                                     Catalog Distribution Chart
@@ -1065,16 +1272,16 @@ export default function SellerDashboard({ user, defaultTab }: SellerDashboardPro
                                 </h3>
                             </div>
 
-                            <div className="w-full h-72 flex items-center justify-center">
-                                {genrePieData.length === 0 ? (
+                            <div className="w-full h-72 min-h-[300px] 3xl:h-96 flex items-center justify-center">
+                                {(sellerAnalyticsData?.genrePieData || genrePieData).length === 0 ? (
                                     <div className="text-xs text-slate-500 font-semibold border border-dashed border-slate-200 dark:border-slate-800 rounded-2xl p-8 text-center">
                                         No published game listings found in database to calculate genre distribution.
                                     </div>
-                                ) : (
-                                    <ResponsiveContainer width="100%" height="100%">
+                                ) : isMounted ? (
+                                    <ResponsiveContainer width="100%" height={300} minWidth={0} minHeight={300}>
                                         <PieChart>
                                             <Pie
-                                                data={genrePieData}
+                                                data={sellerAnalyticsData?.genrePieData || genrePieData}
                                                 cx="50%"
                                                 cy="50%"
                                                 innerRadius={70}
@@ -1082,7 +1289,7 @@ export default function SellerDashboard({ user, defaultTab }: SellerDashboardPro
                                                 paddingAngle={5}
                                                 dataKey="value"
                                             >
-                                                {genrePieData.map((entry, index) => (
+                                                {(sellerAnalyticsData?.genrePieData || genrePieData).map((entry: any, index: number) => (
                                                     <Cell key={`pie-seller-cell-${index}`} fill={entry.color} />
                                                 ))}
                                             </Pie>
@@ -1090,6 +1297,10 @@ export default function SellerDashboard({ user, defaultTab }: SellerDashboardPro
                                             <Legend />
                                         </PieChart>
                                     </ResponsiveContainer>
+                                ) : (
+                                    <div className="w-full h-[300px] flex items-center justify-center text-slate-400 text-sm">
+                                        Loading dynamic chart...
+                                    </div>
                                 )}
                             </div>
                         </div>

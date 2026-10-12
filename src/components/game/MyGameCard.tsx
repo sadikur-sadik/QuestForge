@@ -166,7 +166,7 @@ export default function MyGameCard({ game }: MyGameCardProps) {
         <div className="bg-[var(--color-surface)] rounded-[23px] flex flex-col md:flex-row items-center gap-5 p-5 border border-[var(--color-border)] text-[var(--color-text)] transition-colors duration-300">
           
           {/* Left: Card Aspect cover photo */}
-          <div className="relative w-full md:w-36 aspect-video md:aspect-square rounded-2xl overflow-hidden bg-[var(--color-bg)] shrink-0 shadow-inner">
+          <div className="relative w-full md:w-36 3xl:w-44 aspect-video md:aspect-square rounded-2xl overflow-hidden bg-[var(--color-bg)] shrink-0 shadow-inner">
             <img
               src={game.coverUrl}
               alt={game.title}
@@ -174,7 +174,7 @@ export default function MyGameCard({ game }: MyGameCardProps) {
               loading="lazy"
             />
             {/* Small Genre Overlay */}
-            <div className="absolute top-2 left-2 px-2 py-0.5 rounded font-extrabold text-[8px] uppercase tracking-wider bg-violet-600/90 text-white shadow-sm">
+            <div className="absolute top-2 left-2 px-2 py-0.5 rounded font-extrabold text-[8px] 3xl:text-[9px] uppercase tracking-wider bg-violet-600/90 text-white shadow-sm">
               {game.genre}
             </div>
           </div>
@@ -182,16 +182,16 @@ export default function MyGameCard({ game }: MyGameCardProps) {
           {/* Middle: Info block */}
           <div className="flex-1 flex flex-col gap-2 min-w-0 w-full text-left">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
-              <h3 className="text-lg font-black text-[var(--color-text)] truncate">
+              <h3 className="text-base sm:text-lg 3xl:text-xl font-black text-[var(--color-text)] truncate">
                 {game.title}
               </h3>
-              <span className="font-extrabold text-base text-[var(--color-accent-primary)] shrink-0">
+              <span className="font-extrabold text-sm sm:text-base 3xl:text-lg text-[var(--color-accent-primary)] shrink-0">
                 {formattedPrice}
               </span>
             </div>
 
             {/* Truncated description */}
-            <p className="text-xs text-[var(--color-muted)] line-clamp-2 leading-relaxed pr-2">
+            <p className="text-xs 3xl:text-sm text-[var(--color-muted)] line-clamp-2 leading-relaxed pr-2">
               {game.description}
             </p>
 
@@ -201,13 +201,13 @@ export default function MyGameCard({ game }: MyGameCardProps) {
                 {game.platforms.map((plat) => (
                   <span
                     key={plat}
-                    className="px-2 py-0.5 rounded-md text-[9px] font-bold bg-[var(--color-bg)] text-[var(--color-muted)] border border-[var(--color-border)]"
+                    className="px-2 py-0.5 rounded-md text-[9px] 3xl:text-[10px] font-bold bg-[var(--color-bg)] text-[var(--color-muted)] border border-[var(--color-border)]"
                   >
                     {plat}
                   </span>
                 ))}
               </div>
-              <span className="text-[9px] text-[var(--color-muted)] font-extrabold uppercase tracking-wider">
+              <span className="text-[9px] 3xl:text-[10px] text-[var(--color-muted)] font-extrabold uppercase tracking-wider">
                 Released: {game.releaseDate}
               </span>
             </div>
@@ -218,14 +218,14 @@ export default function MyGameCard({ game }: MyGameCardProps) {
             <button
               onClick={() => setIsEditOpen(true)}
               disabled={isDeleting}
-              className="w-full md:w-32 py-2.5 rounded-xl text-xs font-bold bg-violet-600 hover:bg-violet-500 text-white shadow-md active:scale-[0.98] transition-all duration-200 cursor-pointer disabled:opacity-50"
+              className="w-full md:w-32 3xl:w-36 py-2.5 3xl:py-3 rounded-xl text-xs 3xl:text-sm font-bold bg-violet-600 hover:bg-violet-500 text-white shadow-md active:scale-[0.98] transition-all duration-200 cursor-pointer disabled:opacity-50"
             >
               Edit
             </button>
             <button
               onClick={() => setIsDeleteConfirmOpen(true)}
               disabled={isDeleting}
-              className="w-full md:w-32 py-2.5 rounded-xl text-xs font-bold border border-rose-200 dark:border-rose-950 bg-rose-500/10 hover:bg-rose-600 text-rose-600 dark:text-rose-400 hover:text-white active:scale-[0.98] transition-all duration-200 cursor-pointer disabled:opacity-50"
+              className="w-full md:w-32 3xl:w-36 py-2.5 3xl:py-3 rounded-xl text-xs 3xl:text-sm font-bold border border-rose-200 dark:border-rose-950 bg-rose-500/10 hover:bg-rose-600 text-rose-600 dark:text-rose-400 hover:text-white active:scale-[0.98] transition-all duration-200 cursor-pointer disabled:opacity-50"
             >
               {isDeleting ? "Deleting..." : "Delete"}
             </button>
@@ -279,7 +279,7 @@ export default function MyGameCard({ game }: MyGameCardProps) {
       {/* Edit Modal Dialog */}
       {isEditOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm transition-opacity duration-300">
-          <div className="relative w-full max-w-lg max-h-[85vh] bg-[var(--color-surface)] border border-[var(--color-border)] shadow-2xl rounded-3xl p-6 sm:p-8 flex flex-col gap-4 text-[var(--color-text)] transition-all duration-300 scale-100 overflow-hidden">
+          <div className="relative w-full max-w-lg 3xl:max-w-xl max-h-[85vh] bg-[var(--color-surface)] border border-[var(--color-border)] shadow-2xl rounded-3xl p-6 sm:p-8 flex flex-col gap-4 text-[var(--color-text)] transition-all duration-300 scale-100 overflow-hidden">
             
             {/* Modal Header */}
             <div className="flex items-center justify-between border-b border-[var(--color-border)] pb-4 shrink-0">

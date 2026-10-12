@@ -61,6 +61,8 @@ function useAuthSession() {
 const PUBLIC_ROUTES = [
   { label: "Home", href: "/" },
   { label: "View Games", href: "/games" },
+  { label: "About", href: "/about" },
+  { label: "FAQ", href: "/faq" },
 ];
 
 const AUTH_ROUTES = [
@@ -494,7 +496,7 @@ export default function Navbar() {
           transition-colors duration-300
         "
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="qf-container">
           <div className="flex items-center justify-between h-16">
 
             {/* ── Logo ── */}

@@ -236,35 +236,35 @@ export default function AddGamesPage() {
 
   // Active form view
   return (
-    <div className="relative min-h-[calc(100vh-64px)] w-full flex justify-center py-16 px-4 overflow-hidden bg-slate-50 dark:bg-slate-950 transition-colors duration-300">
+    <div className="relative min-h-[calc(100vh-64px)] w-full flex justify-center py-10 sm:py-16 px-4 sm:px-6 3xl:px-8 overflow-hidden bg-slate-50 dark:bg-slate-950 transition-colors duration-300">
       {/* Background radial highlights */}
       <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
-        <div className="absolute top-1/12 right-0 w-80 h-80 rounded-full bg-violet-600/10 blur-[100px] animate-pulse" />
-        <div className="absolute bottom-1/12 left-0 w-96 h-96 rounded-full bg-cyan-500/10 blur-[120px] animate-pulse" />
+        <div className="absolute top-1/12 right-0 w-80 h-80 3xl:w-[500px] 3xl:h-[500px] rounded-full bg-violet-600/10 blur-[100px] 3xl:blur-[160px] animate-pulse" />
+        <div className="absolute bottom-1/12 left-0 w-96 h-96 3xl:w-[550px] 3xl:h-[550px] rounded-full bg-cyan-500/10 blur-[120px] 3xl:blur-[180px] animate-pulse" />
       </div>
 
-      <div className="relative z-10 w-full max-w-2xl">
-        <div className="relative p-[1px] rounded-3xl overflow-hidden bg-gradient-to-b from-slate-200/50 to-transparent dark:from-slate-700/50 dark:to-transparent shadow-2xl">
-          <div className="relative bg-white/70 dark:bg-slate-900/60 backdrop-blur-2xl px-6 sm:px-10 py-10 rounded-[23px] flex flex-col gap-8 border border-white/20 dark:border-slate-800/40">
+      <div className="relative z-10 w-full max-w-2xl 2xl:max-w-3xl 3xl:max-w-4xl">
+        <div className="relative p-[1px] rounded-3xl 3xl:rounded-[36px] overflow-hidden bg-gradient-to-b from-slate-200/50 to-transparent dark:from-slate-700/50 dark:to-transparent shadow-2xl">
+          <div className="relative bg-white/70 dark:bg-slate-900/60 backdrop-blur-2xl px-6 sm:px-10 3xl:px-14 py-8 sm:py-10 3xl:py-12 rounded-[23px] 3xl:rounded-[34px] flex flex-col gap-6 sm:gap-8 border border-white/20 dark:border-slate-800/40">
             
             {/* Header */}
-            <div className="flex flex-col gap-3 border-b border-slate-200/60 dark:border-slate-800/40 pb-5">
+            <div className="flex flex-col gap-2 sm:gap-3 border-b border-slate-200/60 dark:border-slate-800/40 pb-5">
               <div className="flex items-center gap-2 self-start px-3 py-1 rounded-full border border-violet-200 dark:border-violet-500/30 bg-violet-50 dark:bg-violet-500/10 transition-colors duration-300">
                 <span className="w-1.5 h-1.5 rounded-full bg-cyan-500 animate-ping" />
-                <span className="text-[9px] font-extrabold tracking-wider text-violet-700 dark:text-slate-350 uppercase">
+                <span className="text-[9px] 3xl:text-[11px] font-extrabold tracking-wider text-violet-700 dark:text-slate-350 uppercase">
                   Add Quests
                 </span>
               </div>
-              <h1 className="text-3xl font-black tracking-tight bg-gradient-to-r from-violet-600 to-cyan-500 bg-clip-text text-transparent dark:from-violet-400 dark:to-cyan-400">
+              <h1 className="text-2xl sm:text-3xl 3xl:text-4xl font-black tracking-tight bg-gradient-to-r from-violet-600 to-cyan-500 bg-clip-text text-transparent dark:from-violet-400 dark:to-cyan-400">
                 Forge New Listing
               </h1>
-              <p className="text-slate-500 dark:text-slate-400 text-sm">
+              <p className="text-slate-500 dark:text-slate-400 text-xs sm:text-sm 3xl:text-base">
                 Fill in the details to publish your game onto the QuestForge marketplace.
               </p>
             </div>
 
             {/* Form */}
-            <form onSubmit={handleSubmit} className="flex flex-col gap-6">
+            <form onSubmit={handleSubmit} className="flex flex-col gap-5 sm:gap-6">
               
               {/* Game Title */}
               <div className="flex flex-col gap-2">
@@ -414,7 +414,7 @@ export default function AddGamesPage() {
                   </span>
                 </div>
                 
-                <div className="w-full max-w-sm mx-auto">
+                <div className="w-full max-w-sm 3xl:max-w-md mx-auto">
                   <input
                     type="file"
                     id="cover-upload"

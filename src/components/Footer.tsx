@@ -32,13 +32,13 @@ const GithubIcon = () => (
 export default function Footer() {
   return (
     <footer className="w-full bg-[var(--color-surface)]/80 backdrop-blur-xl border-t border-[var(--color-border)] py-12 transition-colors duration-300">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="qf-container">
         
         {/* ── Grid Container ── */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-10">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-[1.6fr_1fr_1fr_1fr] gap-x-6 gap-y-8 lg:gap-10 mb-10">
           
           {/* Column 1: Info & Brand */}
-          <div className="flex flex-col gap-4">
+          <div className="col-span-2 sm:col-span-3 lg:col-span-1 flex flex-col gap-4">
             <Link href="/" className="flex items-center gap-2.5 group">
               <div className="
                 flex items-center justify-center w-8 h-8 rounded-lg
@@ -53,7 +53,7 @@ export default function Footer() {
                 <span className="text-violet-600 dark:text-violet-400">Quest</span>Forge
               </span>
             </Link>
-            <p className="text-slate-500 dark:text-slate-400 text-sm leading-relaxed max-w-xs transition-colors duration-300">
+            <p className="text-slate-500 dark:text-slate-400 text-sm leading-relaxed max-w-sm transition-colors duration-300">
               Forge your ultimate digital game library. Discover, collectionize, and explore verified titles on the premium gaming hub.
             </p>
             {/* Social Icons */}
@@ -113,24 +113,21 @@ export default function Footer() {
             <Link href="/register" className="text-sm text-slate-500 dark:text-slate-400 hover:text-violet-600 dark:hover:text-violet-400 transition-colors duration-200">
               Create Account
             </Link>
-            <button
-              onClick={() => alert("Help Center is currently in sandbox demo mode.")}
-              className="text-left text-sm text-slate-500 dark:text-slate-400 hover:text-violet-600 dark:hover:text-violet-400 transition-colors duration-200 cursor-pointer"
-            >
+            <Link href="/about" className="text-sm text-slate-500 dark:text-slate-400 hover:text-violet-600 dark:hover:text-violet-400 transition-colors duration-200">
+              About QuestForge
+            </Link>
+            <Link href="/faq" className="text-sm text-slate-500 dark:text-slate-400 hover:text-violet-600 dark:hover:text-violet-400 transition-colors duration-200">
               FAQ & Support
-            </button>
-            <button
-              onClick={() => alert("Privacy Policies are managed by QuestForge Client Sandbox.")}
-              className="text-left text-sm text-slate-500 dark:text-slate-400 hover:text-violet-600 dark:hover:text-violet-400 transition-colors duration-200 cursor-pointer"
-            >
-              Security Policy
-            </button>
+            </Link>
+            <Link href="/about#security" className="text-sm text-slate-500 dark:text-slate-400 hover:text-violet-600 dark:hover:text-violet-400 transition-colors duration-200">
+              Security & Guarantees
+            </Link>
           </div>
 
         </div>
 
         {/* ── Divider & Copyright Row ── */}
-        <div className="border-t border-[var(--color-border)] pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-[var(--color-muted)]">
+        <div className="border-t border-[var(--color-border)] pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-[var(--color-muted)] text-center sm:text-left">
           <p>
             © {new Date().getFullYear()} QuestForge. All rights reserved.
           </p>

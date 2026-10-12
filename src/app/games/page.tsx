@@ -39,6 +39,7 @@ export default async function GamesPage(props: PageProps) {
     platforms: game.platforms,
     coverUrl: game.coverUrl,
     rating: game.rating,
+    reviewsCount: game.reviewsCount || 0,
     releaseDate: game.releaseDate,
     developer: game.developer,
     publisher: game.publisher,
@@ -46,7 +47,7 @@ export default async function GamesPage(props: PageProps) {
   }));
 
   return (
-    <div className="relative min-h-[calc(100vh-64px)] w-full py-16 px-4 overflow-hidden bg-slate-50 dark:bg-slate-950 transition-colors duration-300">
+    <div className="relative min-h-[calc(100vh-64px)] w-full py-8 sm:py-12 lg:py-16 overflow-hidden bg-slate-50 dark:bg-slate-950 transition-colors duration-300">
       
       {/* Background Cyber Glow Blobs */}
       <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
@@ -54,20 +55,20 @@ export default async function GamesPage(props: PageProps) {
         <div className="absolute bottom-[-10%] right-[-10%] w-[450px] h-[450px] rounded-full bg-cyan-500/10 blur-[150px] animate-pulse" />
       </div>
 
-      <div className="relative z-10 max-w-7xl mx-auto flex flex-col gap-10">
+      <div className="relative z-10 qf-container flex flex-col gap-6 sm:gap-10">
         
         {/* Header Title */}
-        <div className="flex flex-col gap-3">
+        <div className="flex flex-col gap-2 sm:gap-3">
           <div className="flex items-center gap-2 self-start px-3 py-1 rounded-full border border-violet-200 dark:border-violet-500/30 bg-violet-50 dark:bg-violet-500/10 transition-colors duration-300">
             <span className="w-1.5 h-1.5 rounded-full bg-cyan-500 animate-ping" />
             <span className="text-[9px] font-extrabold tracking-wider text-violet-700 dark:text-slate-300 uppercase">
               Games Registry
             </span>
           </div>
-          <h1 className="text-3xl sm:text-4xl font-black tracking-tight bg-gradient-to-r from-violet-600 to-cyan-500 bg-clip-text text-transparent dark:from-violet-400 dark:to-cyan-400">
+          <h1 className="text-2xl sm:text-4xl font-black tracking-tight bg-gradient-to-r from-violet-600 to-cyan-500 bg-clip-text text-transparent dark:from-violet-400 dark:to-cyan-400">
             Quest Marketplace
           </h1>
-          <p className="text-sm text-slate-500 dark:text-slate-400 max-w-xl transition-colors duration-300">
+          <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 max-w-xl transition-colors duration-300">
             Explore and acquire new quests. Filter by your preferred genre or sort listings to find the perfect adventure.
           </p>
         </div>
@@ -77,7 +78,7 @@ export default async function GamesPage(props: PageProps) {
 
         {/* Catalog grid */}
         {filteredGames.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="qf-grid-cards">
             {filteredGames.map((game) => (
               <GameCard key={game.id} game={game} />
             ))}

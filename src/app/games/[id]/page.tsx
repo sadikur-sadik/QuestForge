@@ -40,6 +40,7 @@ export default async function GameDetailsPage(props: PageProps) {
     platforms: gameData.platforms,
     coverUrl: gameData.coverUrl,
     rating: gameData.rating,
+    reviewsCount: gameData.reviewsCount || 0,
     releaseDate: gameData.releaseDate,
     createdAt: gameData.createdAt,
     creator: gameData.creator,

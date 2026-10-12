@@ -160,7 +160,7 @@ export default function CategoryDeck() {
           <div
             key={cat.name}
             onClick={() => handleCategoryClick(cat.name)}
-            className="snap-start min-w-[260px] sm:min-w-[280px] flex-shrink-0 relative group p-6 rounded-3xl overflow-hidden bg-white dark:bg-slate-900 border border-slate-200/50 dark:border-slate-800/40 hover:border-violet-500/50 hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 cursor-pointer shadow-lg"
+            className="snap-start w-[min(78vw,260px)] sm:w-[280px] 3xl:w-[320px] flex-shrink-0 relative group p-5 sm:p-6 rounded-3xl overflow-hidden bg-white dark:bg-slate-900 border border-slate-200/50 dark:border-slate-800/40 hover:border-violet-500/50 hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 cursor-pointer shadow-lg"
           >
             {/* Blurred glow circle corresponding to themed color */}
             <div className={`absolute top-[-20%] right-[-20%] w-32 h-32 rounded-full ${cat.glowColor} blur-2xl group-hover:scale-125 transition-transform duration-500`} />

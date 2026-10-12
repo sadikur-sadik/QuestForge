@@ -6,6 +6,7 @@ import { authClient } from "@/lib/auth-client";
 import BuyerDashboard from "@/components/dashboard/BuyerDashboard";
 import SellerDashboard from "@/components/dashboard/SellerDashboard";
 import AdminDashboard from "@/components/dashboard/AdminDashboard";
+import DashboardSkeleton from "@/components/skeletons/DashboardSkeleton";
 
 export type DashboardRole = "buyer" | "seller" | "admin";
 
@@ -50,10 +51,9 @@ export default function DashboardLayoutWrapper({ defaultRoleView, defaultTab }: 
 
     if (isPending || isLoadingRole) {
         return (
-            <div className="min-h-[calc(100vh-64px)] flex items-center justify-center bg-slate-50 dark:bg-slate-950 px-4">
-                <div className="w-full max-w-4xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-8 rounded-3xl animate-pulse space-y-6">
-                    <div className="h-10 bg-slate-200 dark:bg-slate-800 w-1/4 rounded-xl" />
-                    <div className="h-32 bg-slate-200 dark:bg-slate-800 rounded-2xl" />
+            <div className="relative min-h-[calc(100vh-64px)] w-full py-6 bg-slate-50 dark:bg-slate-950">
+                <div className="qf-container">
+                    <DashboardSkeleton roleName={defaultRoleView || "Command Center"} />
                 </div>
             </div>
         );
@@ -64,8 +64,8 @@ export default function DashboardLayoutWrapper({ defaultRoleView, defaultTab }: 
     const activeView = defaultRoleView || fetchedRole || "buyer";
 
     return (
-        <div className="relative min-h-[calc(100vh-64px)] w-full py-10 px-4 sm:px-6 lg:px-8 bg-slate-50 dark:bg-slate-950">
-            <div className="max-w-7xl mx-auto flex flex-col gap-6">
+        <div className="relative min-h-[calc(100vh-64px)] w-full py-6 bg-slate-50 dark:bg-slate-950">
+            <div className="qf-container flex flex-col gap-6">
                 {activeView === "buyer" && <BuyerDashboard user={session.user} defaultTab={defaultTab as any} />}
                 {activeView === "seller" && <SellerDashboard user={session.user} defaultTab={defaultTab as any} />}
                 {activeView === "admin" && <AdminDashboard user={session.user} defaultTab={defaultTab as any} />}

@@ -5,9 +5,9 @@ import Link from "next/link";
 
 export default function Banner() {
   return (
-    <div className="w-full max-w-[96%] mx-auto px-0 py-2">
+    <div className="w-full qf-container py-2">
       {/* Banner Container: Theme-responsive Background and Border */}
-      <div className="relative w-full overflow-hidden rounded-3xl border border-slate-200 dark:border-slate-800/40 shadow-xl dark:shadow-2xl bg-gradient-to-br from-slate-50 via-zinc-100 to-white dark:from-slate-900 dark:via-slate-950 dark:to-zinc-950 p-8 sm:p-12 lg:p-16 select-none transition-colors duration-300">
+      <div className="relative w-full overflow-hidden rounded-3xl border border-slate-200 dark:border-slate-800/40 shadow-xl dark:shadow-2xl bg-gradient-to-br from-slate-50 via-zinc-100 to-white dark:from-slate-900 dark:via-slate-950 dark:to-zinc-950 p-5 sm:p-10 lg:p-14 select-none transition-colors duration-300">
         
         {/* Style block for animations and theme-responsive SVG overrides */}
         <style>{`
@@ -114,10 +114,10 @@ export default function Banner() {
         </div>
 
         {/* Hero Content Grid */}
-        <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+        <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
           
           {/* LEFT COLUMN: TEXT CONTENT & ACTIONS */}
-          <div className="lg:col-span-7 flex flex-col gap-6 text-left">
+          <div className="lg:col-span-7 flex flex-col gap-4 sm:gap-6 text-left">
             
             {/* System Badge - Theme Responsive */}
             <div className="anim-slide-up anim-delay-1 flex items-center gap-2 self-start px-3 py-1 rounded-full border border-violet-200 dark:border-violet-500/30 bg-violet-50 dark:bg-violet-500/10 backdrop-blur-md transition-colors duration-300">
@@ -129,36 +129,36 @@ export default function Banner() {
 
             {/* Main Animated Title - Theme Responsive */}
             <div className="anim-slide-up anim-delay-2 flex flex-col gap-2">
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight text-slate-900 dark:text-white font-sans transition-colors duration-300">
+              <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight text-slate-900 dark:text-white font-sans transition-colors duration-300">
                 QUEST
                 <span className="bg-gradient-to-r from-violet-600 via-fuchsia-500 to-cyan-500 dark:from-violet-400 dark:via-fuchsia-400 dark:to-cyan-400 bg-clip-text text-transparent filter drop-shadow-[0_0_15px_rgba(109,40,217,0.2)] dark:drop-shadow-[0_0_15px_rgba(109,40,217,0.3)]">
                   FORGE
                 </span>
               </h1>
-              <div className="w-24 h-[4px] bg-gradient-to-r from-violet-500 to-cyan-400 rounded-full mt-1" />
+              <div className="w-20 sm:w-24 h-[4px] bg-gradient-to-r from-violet-500 to-cyan-400 rounded-full mt-0.5" />
             </div>
 
             {/* Subtitle / Description - Theme Responsive */}
-            <div className="anim-slide-up anim-delay-3 flex flex-col gap-3">
-              <h2 className="text-lg sm:text-xl font-bold text-slate-800 dark:text-slate-100 transition-colors duration-300">
+            <div className="anim-slide-up anim-delay-3 flex flex-col gap-2 sm:gap-3">
+              <h2 className="text-base sm:text-xl font-bold text-slate-800 dark:text-slate-100 transition-colors duration-300">
                 Forge Your Ultimate Game Catalog
               </h2>
-              <p className="text-sm sm:text-base text-slate-600 dark:text-slate-400 max-w-xl leading-relaxed transition-colors duration-300">
+              <p className="text-xs sm:text-base text-slate-600 dark:text-slate-400 max-w-xl leading-relaxed transition-colors duration-300">
                 Track your quests, review your favorites, and build your digital game archive. Organise your backlog and share achievements in a premium environment designed for gamers.
               </p>
             </div>
 
             {/* Two Call-to-Action Buttons - Theme Responsive */}
-            <div className="anim-slide-up anim-delay-4 flex flex-col sm:flex-row gap-4 mt-2 justify-center lg:justify-start items-center lg:items-start w-full">
+            <div className="anim-slide-up anim-delay-4 flex flex-col sm:flex-row gap-3 sm:gap-4 mt-2 justify-center lg:justify-start items-stretch sm:items-center lg:items-start w-full">
               <Link
                 href="/register"
-                className="w-full sm:w-auto max-w-xs px-6 py-3.5 rounded-xl font-extrabold text-white text-xs bg-gradient-to-r from-violet-600 to-cyan-500 hover:opacity-95 shadow-[0_4px_20px_-4px_rgba(109,40,217,0.4)] active:scale-[0.98] transition-all duration-200 flex items-center justify-center cursor-pointer min-w-[200px] text-center"
+                className="w-full sm:w-auto px-5 sm:px-6 py-3 sm:py-3.5 rounded-xl font-extrabold text-white text-xs bg-gradient-to-r from-violet-600 to-cyan-500 hover:opacity-95 shadow-[0_4px_20px_-4px_rgba(109,40,217,0.4)] active:scale-[0.98] transition-all duration-200 flex items-center justify-center cursor-pointer text-center"
               >
                 Get Started
               </Link>
               <Link
                 href="/games"
-                className="w-full sm:w-auto max-w-xs px-6 py-3.5 rounded-xl font-extrabold text-slate-700 dark:text-slate-300 text-xs border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all active:scale-[0.98] cursor-pointer shadow-sm flex items-center justify-center min-w-[200px] text-center"
+                className="w-full sm:w-auto px-5 sm:px-6 py-3 sm:py-3.5 rounded-xl font-extrabold text-slate-700 dark:text-slate-300 text-xs border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all active:scale-[0.98] cursor-pointer shadow-sm flex items-center justify-center text-center"
               >
                 Explore Games
               </Link>
@@ -168,7 +168,7 @@ export default function Banner() {
 
           {/* RIGHT COLUMN: PREMIUM ANIMATED SVG GRAPHIC - Theme Responsive elements */}
           <div className="lg:col-span-5 flex justify-center lg:justify-end">
-            <div className="relative w-full max-w-[380px] aspect-square">
+            <div className="relative w-full max-w-[280px] sm:max-w-[340px] lg:max-w-[380px] 3xl:max-w-[480px] aspect-square">
               
               <svg
                 xmlns="http://www.w3.org/2000/svg"

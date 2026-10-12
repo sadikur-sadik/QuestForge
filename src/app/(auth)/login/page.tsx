@@ -96,32 +96,32 @@ export default function LoginPage() {
       </div>
 
       {/* ── Main Form Card ── */}
-      <div className="relative z-10 w-full max-w-md">
+      <div className="relative z-10 w-full max-w-md 3xl:max-w-lg">
         <div className="
-          relative p-[1px] rounded-3xl overflow-hidden
+          relative p-[1px] rounded-3xl 3xl:rounded-[36px] overflow-hidden
           bg-gradient-to-b from-slate-200/50 via-slate-200/10 to-transparent
           dark:from-slate-700/50 dark:via-slate-800/10 dark:to-transparent
           shadow-2xl
         ">
 
           <div className="
-            relative bg-white/70 dark:bg-slate-900/60 backdrop-blur-2xl px-8 py-10 rounded-[23px]
+            relative bg-white/70 dark:bg-slate-900/60 backdrop-blur-2xl px-8 sm:px-10 3xl:px-12 py-10 3xl:py-12 rounded-[23px] 3xl:rounded-[34px]
             flex flex-col gap-6 w-full border border-white/20 dark:border-slate-800/40
           ">
 
             {/* Header */}
             <div className="text-center flex flex-col items-center gap-2">
               <div className="
-                flex items-center justify-center w-12 h-12 rounded-2xl
+                flex items-center justify-center w-12 3xl:w-14 h-12 3xl:h-14 rounded-2xl
                 bg-gradient-to-r from-violet-600 to-cyan-500
                 shadow-[0_0_20px_rgba(109,40,217,0.3)] mb-2
               ">
                 <Rocket width={20} height={20} className="text-white" />
               </div>
-              <h2 className="text-2xl font-extrabold tracking-tight text-slate-900 dark:text-white">
+              <h2 className="text-2xl 3xl:text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white">
                 Welcome to <span className="text-violet-600 dark:text-violet-400">Quest</span>Forge
               </h2>
-              <p className="text-[var(--color-muted)] text-sm">
+              <p className="text-[var(--color-muted)] text-sm 3xl:text-base">
                 Log in to sync your game library and bucket list
               </p>
             </div>

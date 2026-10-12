@@ -228,29 +228,29 @@ export default function MyBucket() {
     : "0.0";
 
   return (
-    <div className="relative min-h-[calc(100vh-64px)] w-full py-16 px-4 bg-slate-50 dark:bg-slate-950 transition-colors duration-300">
+    <div className="relative min-h-[calc(100vh-64px)] w-full py-10 sm:py-16 bg-slate-50 dark:bg-slate-950 transition-colors duration-300">
       
       {/* Glow effects specific to this page layout */}
       <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
-        <div className="absolute top-[20%] right-[-10%] w-[500px] h-[500px] rounded-full bg-cyan-500/10 blur-[130px] animate-pulse" />
-        <div className="absolute bottom-[20%] left-[-15%] w-[450px] h-[450px] rounded-full bg-violet-600/10 blur-[140px] animate-pulse" />
+        <div className="absolute top-[20%] right-[-10%] w-[500px] 3xl:w-[700px] h-[500px] 3xl:h-[700px] rounded-full bg-cyan-500/10 blur-[130px] 3xl:blur-[180px] animate-pulse" />
+        <div className="absolute bottom-[20%] left-[-15%] w-[450px] 3xl:w-[650px] h-[450px] 3xl:h-[650px] rounded-full bg-violet-600/10 blur-[140px] 3xl:blur-[180px] animate-pulse" />
       </div>
 
-      <div className="relative z-10 max-w-5xl mx-auto flex flex-col gap-8">
+      <div className="relative z-10 qf-container flex flex-col gap-6 sm:gap-8">
         
         {/* Top Header */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-slate-200 dark:border-slate-800 pb-8">
-          <div className="flex flex-col gap-3">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-slate-200 dark:border-slate-800 pb-6 sm:pb-8">
+          <div className="flex flex-col gap-2 sm:gap-3">
             <div className="flex items-center gap-2 self-start px-3 py-1 rounded-full border border-violet-200 dark:border-violet-500/30 bg-violet-50 dark:bg-violet-500/10 transition-colors duration-300">
               <span className="w-1.5 h-1.5 rounded-full bg-cyan-500 animate-ping" />
-              <span className="text-[9px] font-extrabold tracking-wider text-violet-700 dark:text-slate-300 uppercase">
+              <span className="text-[9px] 3xl:text-[11px] font-extrabold tracking-wider text-violet-700 dark:text-slate-300 uppercase">
                 Gaming Inventory
               </span>
             </div>
-            <h1 className="text-3xl sm:text-4xl font-black tracking-tight bg-gradient-to-r from-violet-600 to-cyan-500 bg-clip-text text-transparent dark:from-violet-400 dark:to-cyan-400">
+            <h1 className="text-2xl sm:text-4xl 3xl:text-5xl font-black tracking-tight bg-gradient-to-r from-violet-600 to-cyan-500 bg-clip-text text-transparent dark:from-violet-400 dark:to-cyan-400">
               My Gaming Vault
             </h1>
-            <p className="text-sm text-slate-500 dark:text-slate-400 max-w-xl transition-colors duration-300">
+            <p className="text-xs sm:text-sm 3xl:text-base text-slate-500 dark:text-slate-400 max-w-xl 3xl:max-w-2xl transition-colors duration-300">
               Access your digital inventory. Download licenses, get activation keys, or review games you have added to your wishlist.
             </p>
           </div>
@@ -259,7 +259,7 @@ export default function MyBucket() {
           <div className="flex bg-slate-100 dark:bg-slate-900 p-1.5 rounded-2xl border border-slate-200 dark:border-slate-800 shrink-0 font-bold">
             <button
               onClick={() => setActiveTab("library")}
-              className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-black transition-all cursor-pointer ${
+              className={`flex items-center gap-2 px-4 sm:px-5 py-2.5 rounded-xl text-xs sm:text-sm font-black transition-all cursor-pointer ${
                 activeTab === "library"
                   ? "bg-slate-900 dark:bg-white text-white dark:text-slate-950 shadow-lg"
                   : "text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
@@ -273,7 +273,7 @@ export default function MyBucket() {
             
             <button
               onClick={() => setActiveTab("wishlist")}
-              className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-black transition-all cursor-pointer relative ${
+              className={`flex items-center gap-2 px-4 sm:px-5 py-2.5 rounded-xl text-xs sm:text-sm font-black transition-all cursor-pointer relative ${
                 activeTab === "wishlist"
                   ? "bg-slate-900 dark:bg-white text-white dark:text-slate-950 shadow-lg"
                   : "text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
@@ -299,47 +299,47 @@ export default function MyBucket() {
           <div className="flex flex-col gap-6">
             
             {/* Library Mini Dashboard Info Row */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 bg-slate-900 text-slate-100 rounded-3xl p-6 border border-slate-800 shadow-xl">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 bg-slate-900 text-slate-100 rounded-3xl p-5 sm:p-6 3xl:p-8 border border-slate-800 shadow-xl">
               <div className="flex items-center gap-4 border-r border-slate-800/80 pr-4 last:border-0">
-                <div className="w-10 h-10 rounded-2xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-cyan-400">
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                <div className="w-10 h-10 3xl:w-12 3xl:h-12 rounded-2xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-cyan-400">
+                  <svg className="w-5 h-5 3xl:w-6 3xl:h-6" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 8.25V6a2.25 2.25 0 00-2.25-2.25H15m-3 12.5v3m0 0l-3-3m3 3l3-3m-9-6h9a2.25 2.25 0 012.25 2.25V15a2.25 2.25 0 01-2.25 2.25H6.75A2.25 2.25 0 014.5 15V8.25A2.25 2.25 0 016.75 6z" />
                   </svg>
                 </div>
                 <div>
-                  <div className="text-[10px] uppercase font-bold tracking-widest text-slate-400">Inventory Status</div>
-                  <div className="text-sm font-black text-cyan-400">ALL SERVICES ONLINE</div>
+                  <div className="text-[10px] 3xl:text-xs uppercase font-bold tracking-widest text-slate-400">Inventory Status</div>
+                  <div className="text-sm 3xl:text-base font-black text-cyan-400">ALL SERVICES ONLINE</div>
                 </div>
               </div>
               
               <div className="flex items-center gap-4 border-r border-slate-800/80 pr-4 last:border-0">
-                <div className="w-10 h-10 rounded-2xl bg-violet-500/10 border border-violet-500/20 flex items-center justify-center text-violet-400">
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                <div className="w-10 h-10 3xl:w-12 3xl:h-12 rounded-2xl bg-violet-500/10 border border-violet-500/20 flex items-center justify-center text-violet-400">
+                  <svg className="w-5 h-5 3xl:w-6 3xl:h-6" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.348a1.125 1.125 0 010 1.971l-11.54 6.347a1.125 1.125 0 01-1.667-.985V5.653z" />
                   </svg>
                 </div>
                 <div>
-                  <div className="text-[10px] uppercase font-bold tracking-widest text-slate-400">Vault Gaming Time</div>
-                  <div className="text-sm font-black text-white">124.8 HOURS PLAYED</div>
+                  <div className="text-[10px] 3xl:text-xs uppercase font-bold tracking-widest text-slate-400">Vault Gaming Time</div>
+                  <div className="text-sm 3xl:text-base font-black text-white">124.8 HOURS PLAYED</div>
                 </div>
               </div>
 
               <div className="flex items-center gap-4 last:border-0">
-                <div className="w-10 h-10 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                <div className="w-10 h-10 3xl:w-12 3xl:h-12 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
+                  <svg className="w-5 h-5 3xl:w-6 3xl:h-6" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                 </div>
                 <div>
-                  <div className="text-[10px] uppercase font-bold tracking-widest text-slate-400">License Authenticity</div>
-                  <div className="text-sm font-black text-emerald-400">100% VERIFIED SECURE</div>
+                  <div className="text-[10px] 3xl:text-xs uppercase font-bold tracking-widest text-slate-400">License Authenticity</div>
+                  <div className="text-sm 3xl:text-base font-black text-emerald-400">100% VERIFIED SECURE</div>
                 </div>
               </div>
             </div>
 
             {/* Grid Container */}
             {ownedGames.length > 0 ? (
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 3xl:grid-cols-7 4xl:grid-cols-8 gap-4 sm:gap-6">
                 {ownedGames.map((game) => {
                   const isDownloading = downloadingId === game.id;
                   const isInstalled = installedIds.includes(game.id) || game.id.startsWith("owned_g");
@@ -461,10 +461,10 @@ export default function MyBucket() {
             TAB 2: MY WISHLIST
             ============================================================== */}
         {activeTab === "wishlist" && (
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-3 3xl:grid-cols-4 gap-6 sm:gap-8">
             
             {/* Wishlist Items List */}
-            <div className="lg:col-span-2 flex flex-col gap-4">
+            <div className="lg:col-span-2 3xl:col-span-3 flex flex-col gap-4">
               {wishlistItems.length > 0 ? (
                 wishlistItems.map((item) => (
                   <div 

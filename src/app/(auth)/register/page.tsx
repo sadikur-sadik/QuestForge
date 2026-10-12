@@ -223,29 +223,29 @@ export default function RegisterPage() {
       </div>
 
       {/* ── Main Form Card ── */}
-      <div className="relative z-10 w-full max-w-md">
+      <div className="relative z-10 w-full max-w-md 3xl:max-w-lg">
         <div className="
-          relative p-[1px] rounded-3xl overflow-hidden
+          relative p-[1px] rounded-3xl 3xl:rounded-[36px] overflow-hidden
           bg-gradient-to-b from-slate-200/50 via-slate-200/10 to-transparent
           dark:from-slate-700/50 dark:via-slate-800/10 dark:to-transparent
           shadow-2xl
         ">
 
           <div className="
-            relative bg-white/70 dark:bg-slate-900/60 backdrop-blur-2xl px-8 py-9 rounded-[23px]
+            relative bg-white/70 dark:bg-slate-900/60 backdrop-blur-2xl px-8 sm:px-10 3xl:px-12 py-9 3xl:py-12 rounded-[23px] 3xl:rounded-[34px]
             flex flex-col gap-5 w-full border border-white/20 dark:border-slate-800/40
           ">
 
             {/* Header */}
             <div className="text-center flex flex-col items-center gap-1.5">
               <div className="
-                flex items-center justify-center w-11 h-11 rounded-2xl
+                flex items-center justify-center w-11 3xl:w-14 h-11 3xl:h-14 rounded-2xl
                 bg-gradient-to-r from-violet-600 to-cyan-500
                 shadow-[0_0_18px_rgba(109,40,217,0.3)] mb-1.5
               ">
                 <Rocket width={18} height={18} className="text-white" />
               </div>
-              <h2 className="text-xl font-extrabold tracking-tight text-slate-900 dark:text-white">
+              <h2 className="text-xl 3xl:text-2xl font-extrabold tracking-tight text-slate-900 dark:text-white">
                 Create Account
               </h2>
               <p className="text-[var(--color-muted)] text-xs">

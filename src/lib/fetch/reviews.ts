@@ -15,7 +15,7 @@ export async function getReviews(gameId: string): Promise<any[]> {
       headers: {
         "Content-Type": "application/json",
       },
-      next: { revalidate: 0 },
+      cache: "no-store",
     });
 
     if (!response.ok) {
@@ -27,6 +27,36 @@ export async function getReviews(gameId: string): Promise<any[]> {
     console.error("Error in getReviews:", error);
     return [];
   }
+}
+
+/**
+ * Retrieves the latest reviews across all games directly from the backend API.
+ * @param limit - Maximum number of reviews to retrieve.
+ */
+export async function getRecentReviews(limit = 6): Promise<any[]> {
+  const apiBase = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+  const url = `${apiBase}/reviews?limit=${limit}`;
+
+  try {
+    const response = await fetch(url, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      cache: "no-store",
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      if (Array.isArray(data)) {
+        return data;
+      }
+    }
+  } catch (error) {
+    console.error("Error in getRecentReviews:", error);
+  }
+
+  return [];
 }
 
 /**
@@ -58,7 +88,7 @@ export async function getUserReviews(userId: string): Promise<any[]> {
         "Content-Type": "application/json",
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
       },
-      next: { revalidate: 0 },
+      cache: "no-store",
     });
 
     if (!response.ok) {

@@ -59,12 +59,12 @@ export default function GameSearchFilter() {
   const hasActiveFilters = searchQuery || activeGenre || activePlatform || activeSort !== "newest";
 
   return (
-    <div className="w-full flex flex-col gap-4 bg-white/70 dark:bg-slate-900/60 backdrop-blur-2xl p-6 rounded-3xl border border-slate-200/50 dark:border-slate-800/40 shadow-xl transition-all duration-300">
-      <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
+    <div className="w-full flex flex-col gap-3 bg-white/70 dark:bg-slate-900/60 backdrop-blur-2xl p-4 sm:p-6 rounded-3xl border border-slate-200/50 dark:border-slate-800/40 shadow-xl transition-all duration-300">
+      <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-12 gap-3 sm:gap-4 items-center">
         
         {/* Search Field */}
-        <div className="md:col-span-4 relative flex items-center">
-          <div className="absolute left-4 text-slate-400 pointer-events-none">
+        <div className="sm:col-span-3 lg:col-span-4 relative flex items-center">
+          <div className="absolute left-3.5 text-slate-400 pointer-events-none">
             <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
@@ -74,18 +74,18 @@ export default function GameSearchFilter() {
             placeholder="Search game titles..."
             value={searchQuery}
             onChange={(e) => handleFilterChange("search", e.target.value)}
-            className="w-full pl-11 pr-4 py-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-white/40 dark:bg-slate-950/20 text-sm text-slate-900 dark:text-white outline-none focus:border-violet-500 focus:shadow-[0_0_0_2px_rgba(109,40,217,0.15)] transition-all duration-200 placeholder:text-slate-400"
+            className="w-full pl-10 pr-3.5 py-2.5 sm:py-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-white/40 dark:bg-slate-950/20 text-xs sm:text-sm text-slate-900 dark:text-white outline-none focus:border-violet-500 focus:shadow-[0_0_0_2px_rgba(109,40,217,0.15)] transition-all duration-200 placeholder:text-slate-400"
           />
         </div>
 
         {/* Platform/Device Selector */}
-        <div className="md:col-span-3 flex flex-col">
+        <div className="lg:col-span-3 flex flex-col min-w-0">
           <select
             value={activePlatform}
             onChange={(e) => handleFilterChange("platform", e.target.value)}
-            className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-white/40 dark:bg-slate-950/20 text-sm text-slate-900 dark:text-white outline-none focus:border-violet-500 focus:shadow-[0_0_0_2px_rgba(109,40,217,0.15)] transition-all duration-200"
+            className="w-full px-3.5 py-2.5 sm:py-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-white/40 dark:bg-slate-950/20 text-xs sm:text-sm text-slate-900 dark:text-white outline-none focus:border-violet-500 focus:shadow-[0_0_0_2px_rgba(109,40,217,0.15)] transition-all duration-200"
           >
-            <option value="" className="bg-white dark:bg-slate-900 text-slate-500">All Platforms (Devices)</option>
+            <option value="" className="bg-white dark:bg-slate-900 text-slate-500">All Platforms</option>
             {PLATFORMS.map((p) => (
               <option key={p} value={p} className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white">
                 {p}
@@ -95,11 +95,11 @@ export default function GameSearchFilter() {
         </div>
 
         {/* Genre Selector */}
-        <div className="md:col-span-2 flex flex-col">
+        <div className="lg:col-span-2 flex flex-col min-w-0">
           <select
             value={activeGenre}
             onChange={(e) => handleFilterChange("genre", e.target.value)}
-            className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-white/40 dark:bg-slate-950/20 text-sm text-slate-900 dark:text-white outline-none focus:border-violet-500 focus:shadow-[0_0_0_2px_rgba(109,40,217,0.15)] transition-all duration-200"
+            className="w-full px-3.5 py-2.5 sm:py-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-white/40 dark:bg-slate-950/20 text-xs sm:text-sm text-slate-900 dark:text-white outline-none focus:border-violet-500 focus:shadow-[0_0_0_2px_rgba(109,40,217,0.15)] transition-all duration-200"
           >
             <option value="" className="bg-white dark:bg-slate-900 text-slate-500">All Genres</option>
             {GENRES.map((g) => (
@@ -111,11 +111,11 @@ export default function GameSearchFilter() {
         </div>
 
         {/* Sort Selector */}
-        <div className="md:col-span-2 flex flex-col">
+        <div className="lg:col-span-2 flex flex-col min-w-0">
           <select
             value={activeSort}
             onChange={(e) => handleFilterChange("sort", e.target.value)}
-            className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-white/40 dark:bg-slate-950/20 text-sm text-slate-900 dark:text-white outline-none focus:border-violet-500 focus:shadow-[0_0_0_2px_rgba(109,40,217,0.15)] transition-all duration-200"
+            className="w-full px-3.5 py-2.5 sm:py-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-white/40 dark:bg-slate-950/20 text-xs sm:text-sm text-slate-900 dark:text-white outline-none focus:border-violet-500 focus:shadow-[0_0_0_2px_rgba(109,40,217,0.15)] transition-all duration-200"
           >
             {SORT_OPTIONS.map((opt) => (
               <option key={opt.value} value={opt.value} className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white">
@@ -126,19 +126,20 @@ export default function GameSearchFilter() {
         </div>
 
         {/* Action Button */}
-        <div className="md:col-span-1 flex justify-end">
+        <div className={`sm:col-span-3 lg:col-span-1 justify-end ${hasActiveFilters ? "flex" : "hidden lg:flex"}`}>
           {hasActiveFilters ? (
             <button
               onClick={handleClearFilters}
-              className="w-full md:w-11 h-11 flex items-center justify-center rounded-xl border border-rose-200 dark:border-rose-950 bg-rose-500/10 hover:bg-rose-500 text-rose-600 dark:text-rose-400 hover:text-white transition-all duration-200 cursor-pointer active:scale-95 shadow-sm"
+              className="w-full lg:w-11 py-2 lg:py-0 h-10 lg:h-11 flex items-center justify-center gap-1.5 rounded-xl border border-rose-200 dark:border-rose-950 bg-rose-500/10 hover:bg-rose-500 text-rose-600 dark:text-rose-400 hover:text-white transition-all duration-200 cursor-pointer active:scale-95 shadow-sm text-xs font-bold"
               title="Clear all filters"
             >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
               </svg>
+              <span className="lg:hidden">Clear Filters</span>
             </button>
           ) : (
-            <div className="hidden md:flex w-11 h-11 items-center justify-center rounded-xl border border-slate-200/50 dark:border-slate-800 bg-white/20 dark:bg-slate-950/20 text-slate-400">
+            <div className="hidden lg:flex w-11 h-11 items-center justify-center rounded-xl border border-slate-200/50 dark:border-slate-800 bg-white/20 dark:bg-slate-950/20 text-slate-400">
               <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
               </svg>
